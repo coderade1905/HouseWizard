@@ -1,0 +1,133 @@
+.navbar{
+    display: flex;
+    width: 100%;
+    height: 70px;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    background: #141414;;
+    top: 0;
+    position: sticky;
+    z-index: 2000;
+}
+.mobileheader{
+    display: flex;
+    width: 100%;
+    height: 60px;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    background: #141414;
+    top: 0;
+    position: sticky;
+    border-bottom: 1px solid #fff;
+    z-index: 2000;
+}
+.navbarmobile{
+    display: flex;
+    width: 100%;
+    height: 60px;
+    justify-content: space-around;
+    align-items: center;
+    color: #fff;
+    background: #141414;
+    bottom: 0;
+    position: sticky;
+    border-top: 1px solid #777;
+    z-index: 2000;
+}
+.navbarmobile svg, .mobileheader svg{
+    font-size: 35px;
+}
+.mobileheader svg{
+    margin-right: 20px;
+}
+.userSection{
+    display: flex;
+    align-items: center;
+    margin-right: 30px;
+}
+.userSection svg{
+    font-size: 30px;
+    margin-right: 20px;
+}
+.userSection img{
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
+.userSectionMobile img{
+    height: 35px;
+    width: 35px;
+    border-radius: 100%;
+}
+.mobilesort{
+    margin-left: 20px;
+}
+.mobileadd{
+    width: 50px;
+    height: 40px;
+    border-radius: 15px;
+    background: #ffffff;
+    color: #000;
+}
+.search{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+.searchinput{
+    border: 1px solid #77777781;
+    border-right: none;
+    color: #ffffff;
+    border-radius: 20px 0px 0px 20px;
+    height: 40px;
+    width: calc(100% - 110px);
+    background: transparent;
+    outline: none;
+    font-size: 20px;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+.searchinput:focus{
+    border: 1px solid #4f42fa;
+    border-right: none;
+}
+.clearsearch{
+    border: 1px solid #77777781;
+    border-left: none;
+    background: transparent;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hidden{
+    display: none;
+}
+.clearsearchicon{
+    color: #fff;
+    font-size: 25px;
+}
+.searchinput:focus ~ .clearsearch{
+    border: 1px solid #4f42fa;
+    border-left: none;
+}
+.searchbtn{
+    border: 1px solid #77777781;
+    border-left: 0px;
+    border-radius: 0px 20px 20px 0px;
+    width: 70px;
+    background: rgba(105, 105, 105, 0.253);
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.searchbtn svg{
+    font-size: 25px;
+}

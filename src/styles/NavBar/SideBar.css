@@ -1,0 +1,87 @@
+.sidebar, .widesidebar {
+    color: #fff;
+    position: fixed;
+    left: 0;
+    z-index: 10002;
+}
+.sidebar{
+    width: 80px;
+}
+.widesidebar{
+    width: 180px;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+    height: 70px;
+}
+.logo svg{
+    font-size: 30px;
+}
+.logo h4{
+    font-size: 25px;
+    margin-left: 25px;
+}
+.menu, .widemenu{
+    width: 100%;
+    display: grid;
+    place-items: center;
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+    margin-top: 40px;
+}
+.menu button {
+    line-break: loose;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    border: none;
+    background: #ddd;
+    color: #333;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.widemenu button {
+    line-break: loose;
+    width: 150px;
+    height: 50px;
+    border-radius: 15px;
+    border: none;
+    background: #ddd;
+    color: #333;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.menu svg{
+    font-size: 25px;
+}
+.menu .buttontext{
+    display: none;
+}
+.widemenu .buttontext{
+    font-weight: 100;
+}
+.widemenu svg{
+    display: none;
+}
+.hidden {
+    display: none;
+}
+.mobilesearch {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+@media screen and (max-width: 490px) {
+    .hidden {
+        display: flex;
+    }
+    .navbar{
+        display: none;
+    }
+}
