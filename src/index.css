@@ -23,11 +23,12 @@ html, body {
 }
 .parent{
   padding-top: 65px;
-  height: 100%;
+  height: calc(100% - 65px) !important;
 }
 @media screen and (max-width: 600px) {
   .parent{
       padding-top: 57px;
+      height: calc(100% - 57px) !important;
   }
 }
 .clear{

@@ -88,6 +88,8 @@ export default function DrawerFilters({ margin }) {
                 "House for rent",
                 "House for sell",
                 "Room for rent",
+                "For sell for businesses",
+                "For rent for businesses",
                 "Appartment",
               ]}
             />

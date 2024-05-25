@@ -31,7 +31,10 @@ function House({title, price, distance, loading, Type}){
 }
 function HomePage(){
     const [loading, setLoading] = useState(false);
-    const {Houses, setHouses} = useContext(HomeContext);
+    const {Houses, setHouses, setHome} = useContext(HomeContext);
+    useEffect(() => {
+        setHome(true);
+    }, []);
     const client = axios.create({
         baseURL: "http://localhost:3000/recommend" 
     });

@@ -53,7 +53,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
@@ -64,7 +63,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
-  const {map, setMap} = React.useContext(HomeContext);
+  const {map, setMap, setHome} = React.useContext(HomeContext);
   const navigate = useNavigate();
   const currentRoute = useLocation();
   React.useEffect(() => {
@@ -94,14 +93,14 @@ export default function PrimarySearchAppBar() {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'flex', md: 'flex' } }}>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Box sx={{ display: { xs: 'flex', md: 'flex' } }} onClick={() => {setHome(false), setMap(true), navigate('/chat')}}>
+            <IconButton size="large"  color="inherit" >
               <Badge badgeContent={4} color="error">
                 <MailIcon />
               </Badge>
             </IconButton>
           </Box>
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }} onClick={() => {setHome(false), setMap(true), navigate('/add')}}>
             <IconButton size="large" aria-label="create an ad" color="inherit">
                   <AddIcon />
             </IconButton>
