@@ -1,0 +1,22 @@
+.view-in-detail{
+    padding: 20px;
+}
+.header{
+    display: flex;
+    justify-content: start;
+    height: 50px;
+    border-bottom: 1px solid #777;
+    margin-bottom: 20px;
+    align-items: center;
+    padding-left: 10px;
+}
+.description {
+    margin-top: 10px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    background: #e2e2e241;
+    border-radius: 15px;
+    color: #fff;
+    padding: 25px;
+}

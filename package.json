@@ -31,6 +31,7 @@
     "react-leaflet": "^4.2.1",
     "react-leaflet-bing-v2": "^5.2.3",
     "react-router-dom": "^6.23.0",
+    "sanity-plugin-leaflet-input": "^1.0.1",
     "styled-components": "^6.1.9"
   },
   "devDependencies": {

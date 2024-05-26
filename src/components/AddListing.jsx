@@ -8,12 +8,16 @@ import Check from '@mui/icons-material/Check';
 import Button from '@mui/joy/Button';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { KeyboardArrowLeft } from "@mui/icons-material";
+import '../styles/AddListing.css';
+import BasicInfo from './BasicInfo';
+import MediaInfo from './MediaInfo';
+import MapInput from './LocationInfo';
+
 
 
 const steps = ['Basic Information', 'Location Information', 'Media Information'];
 
-function ButtonStepper() {
-  const [activeStep, setActiveStep] = React.useState(1);
+function ButtonStepper({activeStep, setActiveStep}) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Stepper sx={{ width: '80%' }}>
@@ -43,20 +47,35 @@ function ButtonStepper() {
   );
 }
 function AddListing() {
+  const [activeStep, setActiveStep] = React.useState(1);
+  const CurrentStep = () => {
+    switch(activeStep){
+      case 1:
+        return <BasicInfo/>;
+      case 2:
+        return <MapInput/>
+      case 3:
+        return <MediaInfo/>
+    }
+  }
   return (
     <CssVarsProvider defaultMode="dark">
       <div style={{ marginTop: "30px" }}>
-        <ButtonStepper />
+        <ButtonStepper activeStep={activeStep} setActiveStep={setActiveStep} />
         <div className="ListingInfo">
           <div className="ListingInfoMain">
+              <CurrentStep/>
             <div className="ListingNav">
               <Button
                 color="primary"
                 disabled={false}
                 loading={false}
-                onClick={function () { }}
+                onClick={function () { 
+                  activeStep > 1 ? setActiveStep(old => old - 1) : ""
+                 }}
                 size="lg"
                 startDecorator={<KeyboardArrowLeft />}
+                style={{ marginLeft: "30px" }}
               >
                 Back
               </Button>
@@ -64,11 +83,14 @@ function AddListing() {
                 color="primary"
                 disabled={false}
                 loading={false}
-                onClick={function () { }}
+                onClick={function () { 
+                  activeStep < 3 ? setActiveStep(old => old + 1) : ""
+                 }}
                 size="lg"
                 endDecorator={<KeyboardArrowRight />}
+                style={{ marginRight: "30px" }}
               >
-                Next
+                {activeStep == 3 ? "Finish" : "Next"}
               </Button>
             </div>
           </div>

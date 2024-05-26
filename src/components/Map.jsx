@@ -11,11 +11,13 @@ import "../styles/leaflet_geolocation.css";
 import SwipeableEdgeDrawer from './navbar/Drawer.jsx';
 import PermanentDrawerLeft from './navbar/DrawerDesktop.jsx';
 
+
 const client = axios.create({
   baseURL: "http://localhost:3000/distance"
 });
 
 const { BaseLayer } = LayersControl;
+
 const SearchField = () => {
   const provider = new OpenStreetMapProvider();
 
