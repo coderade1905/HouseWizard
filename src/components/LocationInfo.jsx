@@ -3,12 +3,14 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import "../styles/leaflet_geolocation.css";
 import { MapContainer, TileLayer, Marker, Popup, LayersControl, useMapEvents, useMap, Tooltip } from 'react-leaflet';
 import { BingLayer } from 'react-leaflet-bing-v2';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { HomeContext } from "../App";
 import 'leaflet/dist/leaflet.css';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import FormHelperText from '@mui/joy/FormHelperText';
 import Input from '@mui/joy/Input';
+import { geohashForLocation } from 'geofire-common';
 
 const { BaseLayer } = LayersControl;
 
@@ -32,13 +34,15 @@ const SearchField = () => {
 
 function MapIn({marker, setMarker}) {
     const position = [9.668168, 39.516678];
+    let hash;
     const MapEvents = () => {
         const map = useMap();
         useMapEvents({
             click: (e) => {
-                const newMarker = { lat: e.latlng.lat, lng: e.latlng.lng };
-                setMarker(newMarker);
-                L.marker(newMarker.lat, newMarker.lng).addTo(map);
+                const { lat, lng } = e.latlng;
+                hash = geohashForLocation([lat, lng]);
+                setMarker({...marker, lat : lat, lng : lng, geohash: hash});
+                L.marker(lat, lng).addTo(map);
             },
         });
         return false;
@@ -70,7 +74,7 @@ function MapIn({marker, setMarker}) {
 }
 
 function MapInput() {
-    const [marker, setMarker] = useState(null);
+    const { data, setData, errors } = useContext(HomeContext);
     let options = {
         startColor: "#fff",
         endColor: "#FF6767",
@@ -104,15 +108,17 @@ function MapInput() {
                         <div style={{width: "400px"}}>
                             <FormControl>
                                 <FormLabel>Latitude</FormLabel>
-                                <Input placeholder="Latitude" value={marker? marker.lat : ""} onChange={(e) => {setMarker({...marker, lat : e.target.value})}} />
+                                <Input placeholder="Latitude" value={data? data.lat : ""} onChange={(e) => {setData({...data, lat : e.target.value})}} />
+                                <FormHelperText>{errors.laterror}</FormHelperText>
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Longitude</FormLabel>
-                                <Input placeholder="Longtiude" value={marker? marker.lng : ""} onChange={(e) => {setMarker({...marker, lng : e.target.value})}} />
+                                <Input placeholder="Longtiude" value={data? data.lng : ""} onChange={(e) => {setData({...data, lng : e.target.value})}} />
+                                <FormHelperText>{errors.lngerror}</FormHelperText>
                             </FormControl>
                         </div>
                     </div>
-                    <MapIn marker={marker} setMarker={setMarker} />
+                    <MapIn marker={data} setMarker={setData} />
                 </div>
             </div>
         </>

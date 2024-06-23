@@ -20,7 +20,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { HomeContext } from '../../App';
 import { useLocation } from 'react-router-dom';
+import { useContext , useEffect} from 'react';
 import zIndex from '@mui/material/styles/zIndex';
+import firebase from 'firebase/compat/app';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -63,11 +65,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
-  const {map, setMap, setHome} = React.useContext(HomeContext);
+  const {map, setMap, setHome} = useContext(HomeContext);
   const navigate = useNavigate();
   const currentRoute = useLocation();
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentRoute.pathname === "/map") {setMap(true);}
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        //pass
+      } else {
+        navigate('/login');
+      }
+    });
   }, [])
 
   return (
@@ -81,7 +90,7 @@ export default function PrimarySearchAppBar() {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-            HouseWizard
+            Gojo Felega
           </Typography>
           <Search>
             <SearchIconWrapper>
@@ -100,11 +109,11 @@ export default function PrimarySearchAppBar() {
               </Badge>
             </IconButton>
           </Box>
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }} onClick={() => {setHome(false), setMap(true), navigate('/add')}}>
-            <IconButton size="large" aria-label="create an ad" color="inherit">
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton size="large" aria-label="create an ad" color="inherit" onClick={() => {setHome(false), setMap(true), navigate('/add')}}>
                   <AddIcon />
             </IconButton>
-            <IconButton size="large" aria-label="account of current user" color="inherit" >
+            <IconButton size="large" aria-label="account of current user" color="inherit" onClick={() => {setHome(false), setMap(true), navigate('/mylistings')}}>
                 <AccountCircle />
             </IconButton>
           </Box>

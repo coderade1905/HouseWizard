@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/chat.css';
 import ChatInput from "./MessagesInput";
 import { CssVarsProvider } from "@mui/joy/styles";
 import Avatar from '@mui/joy/Avatar';
+import { useParams } from 'react-router-dom';
 
 
 function Card({selected}){
@@ -19,16 +20,14 @@ function Card({selected}){
   )
 }
 const ChatUI = () => {
-  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-
-  const sendMessage = () => {
-    if (message.trim()) {
-      setMessages([...messages, { sender: 'user', message }]);
-      setMessage('');
+  const [to, setTo] = useState([]);
+  let { user } = useParams();
+  useEffect(() => {
+    if (user){
+      setTo(user);
     }
-  };
-
+  }, [])
   return (
     <CssVarsProvider defaultMode="dark">
       <div className="chat">
@@ -53,11 +52,18 @@ const ChatUI = () => {
             <div className="contact"></div>
           </div>
           <div className="chatcontent">
-            <div className="sent"><span>Hey</span></div>
-            <div className="received"><span>Hi</span></div>
+            {messages.map((element, i ) => {
+              if (element.sender == "user"){
+                return <div key={i} className="sent"><span>{element.message}</span></div>
+              }
+              else{
+                return <div key={i} className="received"><span>{element.message}</span></div>
+              }
+            })}
           </div>
+
           <div className='chatinput'>
-            <ChatInput style={{ height: "30px", width: "100%" }} />
+            <ChatInput setMessages={setMessages} messages={messages} to={to} style={{ height: "30px", width: "100%" }} />
           </div>
         </div>
       </div>

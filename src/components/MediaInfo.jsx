@@ -5,7 +5,12 @@ import FormHelperText from '@mui/joy/FormHelperText';
 import Input from '@mui/joy/Input';
 import Button from '@mui/joy/Button';
 import SvgIcon from '@mui/joy/SvgIcon';
+import { useState } from "react";
 import { styled } from '@mui/joy';
+import { storage } from '../firebase';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { useContext } from 'react';
+import { HomeContext } from "../App";
 
 const VisuallyHiddenInput = styled('input')`
   clip: rect(0 0 0 0);
@@ -20,12 +25,59 @@ const VisuallyHiddenInput = styled('input')`
 `;
 
 function Inputs() {
+    const [progresspercent, setProgresspercent] = useState(0);
+    const [progresspercent1, setProgresspercent1] = useState(0);
+    const { data, setData, errors } = useContext(HomeContext);
+    const handleUpload = (e) => {
+        e.preventDefault()
+        const file = e.target.files[0];
+        const storageRef = ref(storage, `files/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on("state_changed",
+        (snapshot) => {
+            const progress =
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            setProgresspercent(progress);
+        },
+        (error) => {
+            alert(error);
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                setData({ ...data, im: downloadURL })
+            });
+        }
+        );
+    }
+    const handleUpload1 = (e) => {
+        e.preventDefault()
+        const file = e.target.files[0];
+        const storageRef = ref(storage, `files/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        uploadTask.on("state_changed",
+        (snapshot) => {
+            const progress =
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            setProgresspercent1(progress);
+        },
+        (error) => {
+            alert(error);
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                setData({ ...data, pl: downloadURL })
+            });
+        }
+        );
+    }
     return (
         <div className="inputs">
             <FormControl>
                 <FormLabel>Exterior & Interior Images</FormLabel>
                 <Button
                     component="label"
+                    onChange={handleUpload}
                     role={undefined}
                     tabIndex={-1}
                     color="primary"
@@ -50,7 +102,7 @@ function Inputs() {
                     Upload a file
                     <VisuallyHiddenInput type="file" />
                 </Button>
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <FormHelperText>{`${progresspercent}%`}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>House Plan Images</FormLabel>
@@ -59,6 +111,7 @@ function Inputs() {
                     role={undefined}
                     tabIndex={-1}
                     color="primary"
+                    onChange={handleUpload1}
                     startDecorator={
                         <SvgIcon>
                             <svg
@@ -80,7 +133,7 @@ function Inputs() {
                     Upload a file
                     <VisuallyHiddenInput type="file" />
                 </Button>
-                <FormHelperText>(Optional).</FormHelperText>
+                <FormHelperText>{`${progresspercent1}%`}</FormHelperText>
             </FormControl>
         </div>
     )

@@ -7,12 +7,19 @@ import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import { Box, Chip } from '@mui/joy';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import { useContext } from 'react';
+import { HomeContext } from "../App";
 
 
-function TypeSelect() {
+function TypeSelect({ values, setValues }) {
+    const handleChange = (event, newValue) => {
+        setValues({...values, type: newValue});
+    };
     return (
         <Select
             placeholder="Type of property"
+            value={values.type}
+            onChange={handleChange}
             indicator={<KeyboardArrowDown />}
             sx={{
                 width: 200
@@ -29,22 +36,18 @@ function TypeSelect() {
     );
 }
 
-function SelectMultiple() {
+function SelectMultiple({ values, setValues }) {
+    const handleChange = (event, newValue) => {
+        setValues({...values, extras: newValue});
+    };
     return (
         <Select
+            value={values.extras}
             multiple
-            defaultValue={['dog', 'cat']}
-            renderValue={(selected) => (
-                <Box sx={{ display: 'flex', gap: '0.25rem' }}>
-                    {selected.map((selectedOption) => (
-                        <Chip variant="soft" color="primary">
-                            {selectedOption.label}
-                        </Chip>
-                    ))}
-                </Box>
-            )}
+            onChange={handleChange}
             sx={{
-                minWidth: '15rem',
+                minWidth: '13rem',
+                color: '#fff !important'
             }}
             slotProps={{
                 listbox: {
@@ -54,46 +57,48 @@ function SelectMultiple() {
                 },
             }}
         >
-            <Option value="wifi">WiFi</Option>
+            <Option value="wifi">Wifi</Option>
             <Option value="kitchen">Kitchen</Option>
-            <Option value="shower">Shower</Option>
-            <Option value="laundary">Laundary</Option>
+            <Option value="tv">TV</Option>
+            <Option value="parking">Parking</Option>
+            <Option value="heating">Heating</Option>
         </Select>
     );
 }
 
 function Inputs() {
+    const { data, setData, errors } = useContext(HomeContext);
     return (
         <div className="inputs">
             <FormControl>
                 <FormLabel>Title</FormLabel>
-                <Input placeholder="Title" />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <Input placeholder="Title" defaultValue={data.title} onChange={(e) => { setData({ ...data, title: e.target.value }) }} />
+                <FormHelperText>{errors.tierror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Area</FormLabel>
-                <Input type="number" startDecorator="sqm" placeholder="Area" />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <Input value={data.area} onChange={(e) => { setData({ ...data, area: e.target.value }) }} type="number" startDecorator="sqm" placeholder="Area" />
+                <FormHelperText>{errors.aerror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Type</FormLabel>
-                <TypeSelect />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <TypeSelect values={data} setValues={setData} />
+                <FormHelperText>{errors.tyerror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Price</FormLabel>
-                <Input type="number" startDecorator="ETB" placeholder="Price" />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <Input value={data.price} onChange={(e) => { setData({ ...data, price: Number(e.target.value) }) }} type="number" startDecorator="ETB" placeholder="Price" />
+                <FormHelperText>{errors.perror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Description</FormLabel>
-                <Input placeholder="Description" />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <Input value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} placeholder="Description" />
+                <FormHelperText>{errors.derror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Extras</FormLabel>
-                <SelectMultiple />
-                <FormHelperText>This is a helper text.</FormHelperText>
+                <SelectMultiple values={data} setValues={setData} />
+                <FormHelperText>{errors.exerror}</FormHelperText>
             </FormControl>
         </div>
     )
@@ -110,23 +115,23 @@ function BasicInfo() {
     return (
         <>
             <Typography
-            variant={options.variant}
-            textAlign={options.textAlign}
-            sx={{
-                backgroundImage: `linear-gradient( to ${options.direction}, ${options.startColor}, ${options.endColor})`,
-                backgroundSize: "100%",
-                backgroundRepeat: "repeat",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                textAlign: "center",
-                marginTop: "30px",
-                fontSize: "35px"
-            }}
-        >
-            Step 1: Add Basic Information
-        </Typography>
-        <Inputs />
+                variant={options.variant}
+                textAlign={options.textAlign}
+                sx={{
+                    backgroundImage: `linear-gradient( to ${options.direction}, ${options.startColor}, ${options.endColor})`,
+                    backgroundSize: "100%",
+                    backgroundRepeat: "repeat",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textAlign: "center",
+                    marginTop: "30px",
+                    fontSize: "35px"
+                }}
+            >
+                Step 1: Add Basic Information
+            </Typography>
+            <Inputs />
         </>
     );
 }

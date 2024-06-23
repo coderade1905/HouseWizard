@@ -10,11 +10,11 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import "../styles/leaflet_geolocation.css";
 import SwipeableEdgeDrawer from './navbar/Drawer.jsx';
 import PermanentDrawerLeft from './navbar/DrawerDesktop.jsx';
+import { db } from "../firebase";
+import { collection, query, where, orderBy, startAt, doc, getDoc, getDocs } from 'firebase/firestore';
+import { useParams } from 'react-router-dom';
+import * as L from "leaflet";
 
-
-const client = axios.create({
-  baseURL: "http://localhost:3000/distance"
-});
 
 const { BaseLayer } = LayersControl;
 
@@ -36,25 +36,70 @@ const SearchField = () => {
   return null;
 };
 function VMap() {
-  const position = [9.668168, 39.516678];
   const [Zoom, setZoom] = useState(13);
-  const { setPlaceInfo, Houses, setHouses, setOpen } = useContext(HomeContext);
+  const {setMap, setPlaceInfo, Houses, setHouses, setOpen, selected, setSelected, position, setPostion } = useContext(HomeContext);
+  async function fetchData() {
+    const querySnapshot = await getDocs(collection(db, "listings"));
+    setHouses([]);
+    querySnapshot.forEach((doc) => {
+      let res = doc.data().data;
+      setHouses((prev) => [...prev, { title: res.title, price: res.price, type: res.type, area: res.area, im: res.im, pname: res.pname, lat: res.lat, lng: res.lng, description: res.description, extras: res.extras, id : doc.id, pemail: res.pemail }])
+    });
+    const map = useMap();
+    let center = map.getCenter();
+    setPostion([center.lat, center.lng]);
+  }
+  useEffect(() => {
+    fetchData();
+  }, [])
+  const RecenterAutomatically = () => { 
+    const map = useMap();
+    useEffect(() => {
+      map.setView([position[0], position[1]]);
+    }, [position]);
+  
+    return null;
+  };
+  const redIcon = new L.Icon({
+    iconUrl: "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
+  const blueIcon = new L.Icon({
+    iconUrl: "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });;
+  let { id } = useParams();
+  useEffect(() => {
+    async function FetchData() {
+      if (id) {
+        console.log(id, 123);
+        const snapshot = await getDoc(doc(db, "listings", id));
+        if (snapshot.exists()) {
+          // Document exists, you can access its data
+          const data = snapshot.data();
+          console.log("Document data:", data);
+          setOpen(true);
+          setPlaceInfo(data.data);
+          setMap(true);
+        } else {
+          console.log("Document does not exist.");
+        }
+      }
+    }
+    FetchData();
+  }, []);
   const MapEvents = () => {
     const map = useMap();
     useMapEvents({
       zoomend() {
         const zoom = map.getZoom();
         setZoom(zoom);
-      },
-      moveend() {
-        let center = map.getCenter();
-        client.get(`${center["lat"]}/${center["lng"]}`).then((response) => {
-          setHouses([]);
-          response.data.forEach((element) => {
-            setHouses(prevArr => [...prevArr, { title: element.Title, price: element.Price, distance: element.distance, lat: element.latitude, lng: element.longitude }]);
-          }
-          );
-        });
       }
     });
     return false;
@@ -63,7 +108,7 @@ function VMap() {
   return (
     <>
       <div className="map">
-        <PermanentDrawerLeft />
+        <PermanentDrawerLeft setSelected={setSelected} />
         <MapContainer center={position} zoom={20}  >
           <SearchField />
           <LayersControl position='topright'>
@@ -77,22 +122,26 @@ function VMap() {
           <MapEvents />
           {Zoom >= 13 ?
             Houses.map(((element, i) => {
+              console.log(element);
               return (
                 <Marker
                   eventHandlers={{
                     click: (e) => {
                       setOpen(true);
-                      setPlaceInfo({ title: element.title, price: element.price });
+                      setPlaceInfo(element);
+                      setSelected(element.id);
+                      setPostion([element.lat, element.lng]);
                     },
-                  }} key={i} position={[element.lat, element.lng]}>
+                  }} key={i} position={[element.lat, element.lng]} icon={(element.id === selected? redIcon : blueIcon)}>
                   <Tooltip>ETB {element.price}, Area  4sqm</Tooltip>
                 </Marker>
               );
             }))
             : null}
+            <RecenterAutomatically />
         </MapContainer>
       </div>
-      <SwipeableEdgeDrawer />
+      <SwipeableEdgeDrawer  />
     </>
   );
 }

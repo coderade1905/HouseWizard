@@ -20,3 +20,15 @@
     color: #fff;
     padding: 25px;
 }
+.infos{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}
+.infos span{
+    color: #43dd89;
+    border: 1px solid #777;
+    font-size: 25px;
+    border-radius: 10px;
+    padding: 0px 10px 0px 10px;
+}
