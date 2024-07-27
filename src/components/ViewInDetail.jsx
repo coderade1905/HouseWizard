@@ -18,10 +18,12 @@ import HvacIcon from '@mui/icons-material/Hvac';
 import CallIcon from '@mui/icons-material/Call';
 import Button from '@mui/joy/Button';
 import { useNavigate } from 'react-router-dom';
-
+import { Gallery } from "react-grid-gallery";
+import Slideshow from './minicomps/slideshow.jsx';
 
 function ViewInDetail() {
     const { setOpen, placeInfo } = useContext(HomeContext);
+    let allPhotos = [placeInfo.im, placeInfo.im, placeInfo.im];
     const navigate = useNavigate();
     const Icons = {"tv" : <TvIcon />, "wifi" : <NetworkWifi3BarIcon />, "kitchen" : <SoupKitchenIcon />, "parking" : <LocalParkingIcon />, "heating" : <HvacIcon /> };
     const types = { "hfs": "House for sale", "hfr": "House for rent", "rfr": "Room for rent", "lnd": "Land", "fsb": "For sell for businesses", "frb": "For rent for businesses", "app": "Appartment" };
@@ -31,13 +33,7 @@ function ViewInDetail() {
                 <KeyboardArrowLeft style={{ fontSize: "45px", color: "white" }} />
             </div>
             <div className='view-in-detail'>
-                <AspectRatio ratio="21/9">
-                    <img
-                        alt=""
-                        src={placeInfo.im}
-                        style={{ borderRadius: "20px" }}
-                    />
-                </AspectRatio>
+                <Slideshow allPhotos={allPhotos}/>
                 <Typography sx={{ overflow: 'hidden', fontSize: '30px', marginTop: "20px" }}>
                     {placeInfo.title}
                 </Typography>

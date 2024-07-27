@@ -1,10 +1,9 @@
 import '../styles/Home.css';
-import { Skeleton, Avatar } from '@mui/material';
-import { useState, useContext, useEffect } from 'react';
+import {  useContext, useEffect } from 'react';
 import Filter from './navbar/Filter';
 import { useGeolocated } from "react-geolocated";
 import { HomeContext } from '../App';
-import { collection, query, orderBy, startAt, endAt, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { LoadingSkeleton } from './navbar/DrawerDesktop.jsx';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +27,7 @@ function House({ title, price, type, area, im, pname }) {
     )
 }
 function HomePage() {
-    const [loading, setLoading] = useState(false);
-    const { Houses, setHouses, setHome, setOpen, setPlaceInfo, selected, setSelected, position, setPostion } = useContext(HomeContext);
+    const { Houses, setHouses, setHome, setSelected, setPostion } = useContext(HomeContext);
     const navigate = useNavigate();
     useEffect(() => {
         setHome(true);
