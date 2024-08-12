@@ -108,12 +108,12 @@ function MapInput() {
                         <div style={{width: "400px"}}>
                             <FormControl>
                                 <FormLabel>Latitude</FormLabel>
-                                <Input placeholder="Latitude" value={data? data.lat : ""} onChange={(e) => {setData({...data, lat : e.target.value})}} />
+                                <Input placeholder="Latitude" value={data? data.lat : ""} onChange={(e) => {if (!isNaN(e.target.value)) {setData({...data, lat : e.target.value})}}} />
                                 <FormHelperText>{errors.laterror}</FormHelperText>
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Longitude</FormLabel>
-                                <Input placeholder="Longtiude" value={data? data.lng : ""} onChange={(e) => {setData({...data, lng : e.target.value})}} />
+                                <Input placeholder="Longtiude" value={data? data.lng : ""} onChange={(e) => {if (!isNaN(e.target.value)) {setData({...data, lng : e.target.value})}}} />
                                 <FormHelperText>{errors.lngerror}</FormHelperText>
                             </FormControl>
                         </div>

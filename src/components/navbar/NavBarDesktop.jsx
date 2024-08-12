@@ -7,21 +7,16 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
 import MapIcon from '@mui/icons-material/Map';
 import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MoreIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
+import { useContext , useEffect} from 'react';
 import { HomeContext } from '../../App';
 import { useLocation } from 'react-router-dom';
-import { useContext , useEffect} from 'react';
-import zIndex from '@mui/material/styles/zIndex';
 import firebase from 'firebase/compat/app';
 
 
@@ -64,8 +59,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar() {
-  const {map, setMap, setHome} = useContext(HomeContext);
+export default function PrimarySearchAppBar({map, setMap, setHome}) {
   const navigate = useNavigate();
   const currentRoute = useLocation();
   useEffect(() => {

@@ -70,8 +70,8 @@ function AddListing() {
     setData({...data, pname : user.displayName, pemail: user.email})
     if (activeStep < 4) {
       if(activeStep === 1){
-        if (data.title === ""){
-          setErrors({...errors, tierror: "this field is required"});
+        if (data.bednum === 0){
+          setErrors({...errors, bderror: "this field is required"});
         }
         else if (data.type === "" || data.type === null){
           setErrors({...errors, tyerror: "this field is required"});

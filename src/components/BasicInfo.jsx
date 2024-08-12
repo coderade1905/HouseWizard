@@ -3,6 +3,7 @@ import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import FormHelperText from '@mui/joy/FormHelperText';
 import Input from '@mui/joy/Input';
+import {Textarea} from "@mui/joy";
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import { Box, Chip } from '@mui/joy';
@@ -71,13 +72,13 @@ function Inputs() {
     return (
         <div className="inputs">
             <FormControl>
-                <FormLabel>Title</FormLabel>
-                <Input placeholder="Title" defaultValue={data.title} onChange={(e) => { setData({ ...data, title: e.target.value }) }} />
-                <FormHelperText>{errors.tierror}</FormHelperText>
+                <FormLabel>Bed Number</FormLabel>
+                <Input type="number" placeholder="Bed Number" value={data.bednum} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, bednum: Number(e.target.value) })}}} />
+                <FormHelperText>{errors.bderror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Area</FormLabel>
-                <Input value={data.area} onChange={(e) => { setData({ ...data, area: e.target.value }) }} type="number" startDecorator="sqm" placeholder="Area" />
+                <Input value={data.area} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, area: Number(e.target.value) })}}} type="number" startDecorator="sqm" placeholder="Area" />
                 <FormHelperText>{errors.aerror}</FormHelperText>
             </FormControl>
             <FormControl>
@@ -87,12 +88,12 @@ function Inputs() {
             </FormControl>
             <FormControl>
                 <FormLabel>Price</FormLabel>
-                <Input value={data.price} onChange={(e) => { setData({ ...data, price: Number(e.target.value) }) }} type="number" startDecorator="ETB" placeholder="Price" />
+                <Input value={data.price} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, price: Number(e.target.value) })}}} type="number" startDecorator="ETB" placeholder="Price" />
                 <FormHelperText>{errors.perror}</FormHelperText>
             </FormControl>
             <FormControl>
                 <FormLabel>Description</FormLabel>
-                <Input value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} placeholder="Description" />
+                <Textarea value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} placeholder="Description" />
                 <FormHelperText>{errors.derror}</FormHelperText>
             </FormControl>
             <FormControl>

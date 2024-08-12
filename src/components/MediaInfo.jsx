@@ -30,25 +30,27 @@ function Inputs() {
     const { data, setData, errors } = useContext(HomeContext);
     const handleUpload = (e) => {
         e.preventDefault()
-        const file = e.target.files[0];
-        const storageRef = ref(storage, `files/${file.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
-
-        uploadTask.on("state_changed",
-        (snapshot) => {
-            const progress =
-            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            setProgresspercent(progress);
-        },
-        (error) => {
-            alert(error);
-        },
-        () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                setData({ ...data, im: downloadURL })
-            });
-        }
-        );
+        const files = e.target.files;
+        files.map((file) => {
+            const storageRef = ref(storage, `files/${file.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+    
+            uploadTask.on("state_changed",
+            (snapshot) => {
+                const progress =
+                Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                setProgresspercent(progress);
+            },
+            (error) => {
+                alert(error);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    setData({ ...data, im: downloadURL })
+                });
+            }
+            );
+        })
     }
     const handleUpload1 = (e) => {
         e.preventDefault()
@@ -100,7 +102,7 @@ function Inputs() {
                     }
                 >
                     Upload a file
-                    <VisuallyHiddenInput type="file" />
+                    <VisuallyHiddenInput multiple type="file" />
                 </Button>
                 <FormHelperText>{`${progresspercent}%`}</FormHelperText>
             </FormControl>

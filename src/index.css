@@ -41,3 +41,6 @@ html, body {
 .filter:hover{
   color: #000 !important;
 }
+.carousel .thumbs-wrapper{
+  margin-bottom: 0px;
+}

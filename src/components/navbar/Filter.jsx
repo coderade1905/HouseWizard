@@ -16,14 +16,11 @@ import { CssVarsProvider } from "@mui/joy/styles";
 import { collection, query, orderBy, startAt, endAt, getDocs, where } from 'firebase/firestore';
 import FormHelperText from '@mui/joy/FormHelperText';
 import { db } from '../../firebase';
-import { useContext } from 'react';
-import { HomeContext } from "../../App";
 
-export default function DrawerFilters({ margin }) {
+export default function DrawerFilters({ margin, useHouses }) {
   const [open, setOpen] = React.useState(false);
   const [type, setType] = React.useState([]);
   const [price, setPrice] = React.useState({min: 0, max : 0});
-  const { setHouses } = useContext(HomeContext);
   const types =
   {
     "House for sale": "hfs",
