@@ -6,24 +6,21 @@ import StepButton from '@mui/joy/StepButton';
 import StepIndicator from '@mui/joy/StepIndicator';
 import Check from '@mui/icons-material/Check';
 import Button from '@mui/joy/Button';
-import { KeyboardArrowRight } from '@mui/icons-material';
-import { KeyboardArrowLeft } from "@mui/icons-material";
+import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
 import '../styles/AddListing.css';
 import BasicInfo from './BasicInfo';
 import MediaInfo from './MediaInfo';
 import MapInput from './LocationInfo';
 import { useContext, useState } from 'react';
 import { HomeContext } from "../App";
-import { collection, addDoc } from "firebase/firestore"; 
-import { db } from "../firebase";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
+import supabase from '../supabase.js';
 
 const steps = ['Basic Information', 'Location Information', 'Media Information'];
 
 function ButtonStepper({ activeStep, setActiveStep }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div className="DesktopStepper">
       <Stepper sx={{ width: '80%' }}>
         {steps.map((step, index) => (
           <Step
@@ -43,120 +40,149 @@ function ButtonStepper({ activeStep, setActiveStep }) {
               },
             }}
           >
-            <StepButton style={{ color: "#fff" }} onClick={() => setActiveStep(index)}>{step}</StepButton>
+            <StepButton style={{ color: "#fff" }}>{step}</StepButton>
           </Step>
         ))}
       </Stepper>
     </div>
   );
 }
-const CurrentStep = ({activeStep}) => {
+
+const CurrentStep = ({ activeStep, active, setActive }) => {
   switch (activeStep) {
+    case 0:
+      return <BasicInfo active={active} setActive={setActive} />;
     case 1:
-      return <BasicInfo />;
+      return <MapInput />;
     case 2:
-      return <MapInput />
-    case 3:
-      return <MediaInfo />
+      return <MediaInfo />;
+    default:
+      return null;
   }
 }
+
 function AddListing() {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(1);
-  const { data, setData, errors, setErrors } = useContext(HomeContext);
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const [activeStep, setActiveStep] = useState(0);
+  const { data, setData, errors, setErrors, user, active, setActive } = useContext(HomeContext);
+
+  const insertRecord = async (data1) => {
+    const { data: insertData, error } = await supabase
+      .from('listings')
+      .insert([data1]);
+
+    if (error) {
+      console.error('Error inserting record:', error);
+    } else {
+      console.log('Record inserted:', insertData);
+    }
+  };
+
   const handleSubmit = async () => {
-    setData({...data, pname : user.displayName, pemail: user.email})
-    if (activeStep < 4) {
-      if(activeStep === 1){
-        if (data.bednum === 0){
-          setErrors({...errors, bderror: "this field is required"});
+    if (activeStep < 3) {
+      setErrors({});
+      let hasError = false;
+
+      if (activeStep === 0) {
+        if (!data.type) {
+          setErrors(prev => ({ ...prev, tyerror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.type === "" || data.type === null){
-          setErrors({...errors, tyerror: "this field is required"});
+        if (!active.bednum && data.bednum === 0) {
+          setErrors(prev => ({ ...prev, bderror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.description === ""){
-          setErrors({...errors, derror: "this field is required"});
+        if (!active.area && data.area === 0) {
+          setErrors(prev => ({ ...prev, aerror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.price === 0){
-          setErrors({...errors, perror: "this field is required"});
+        if (!active.price && data.price === 0) {
+          setErrors(prev => ({ ...prev, perror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.area === 0){
-          setErrors({...errors, aerror: "this field is required"});
+        if (!active.description && data.description === "") {
+          setErrors(prev => ({ ...prev, derror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.extras.length === 0){
-          setErrors({...errors, exerror: "this field is required"});
+        if (!active.extras && data.extras.length === 0) {
+          setErrors(prev => ({ ...prev, exerror: "This field is required" }));
+          hasError = true;
         }
-        else{
-          setActiveStep(old => old + 1);
-        }
+        if (!hasError) setActiveStep(old => old + 1);
       }
-      else if (activeStep === 2){
-        if (data.lng === ""){
-          setErrors({...errors, lngerror: "this field is required"});
+      else if (activeStep === 1) {
+        if (!data.location) {
+          setErrors(prev => ({ ...prev, locerror: "This field is required" }));
+          hasError = true;
         }
-        else if (data.lat === ""){
-          setErrors({...errors, laterror: "this field is required"});
+        if (!data.lng) {
+          setErrors(prev => ({ ...prev, lngerror: "This field is required" }));
+          hasError = true;
         }
-        else{
-          setActiveStep(old => old + 1);
+        if (!data.lat) {
+          setErrors(prev => ({ ...prev, laterror: "This field is required" }));
+          hasError = true;
         }
+        if (!hasError) setActiveStep(old => old + 1);
       }
-      else{
-        console.log(user.email);
+      else if (activeStep === 2) {
         try {
-          const docRef = await addDoc(collection(db, "listings"), {
-            data
-          });
-          navigate(`/listing/${docRef.id}`);
+          const { data: user1, error } = await supabase.auth.getUser();
+
+          if (error) {
+            console.error('Error fetching user:', error);
+            return;
+          }
+
+          if (user1 && user1.user) {
+            setData({ ...data, user_id: user1.user.id });
+            await insertRecord(data);
+            navigate("/");
+            console.log(data);
+          } else {
+            console.error('User data is not available');
+          }
         } catch (e) {
-          console.error("Error adding document: ", e);
+          console.error('Unexpected error:', e);
         }
-        
-        console.log(data);
       }
     }
   }
+
   return (
     <CssVarsProvider defaultMode="dark">
-        <div style={{ marginTop: "30px" }}>
-          <ButtonStepper activeStep={activeStep} setActiveStep={setActiveStep} errors={errors} />
-          <div className="ListingInfo">
-            <div className="ListingInfoMain">
-              <CurrentStep activeStep={activeStep} />
-              <div className="ListingNav">
-                <Button
-                  color="primary"
-                  disabled={false}
-                  loading={false}
-                  onClick={function () {
-                    activeStep > 1 ? setActiveStep(old => old - 1) : ""
-                  }}
-                  size="lg"
-                  startDecorator={<KeyboardArrowLeft />}
-                  style={{ marginLeft: "30px" }}
-                >
-                  Back
-                </Button>
-                <Button
-                  color="primary"
-                  disabled={false}
-                  loading={false}
-                  onClick={function () {
-                    handleSubmit();
-                  }}
-                  size="lg"
-                  endDecorator={<KeyboardArrowRight />}
-                  style={{ marginRight: "30px" }}
-                >
-                  {activeStep == 3 ? "Finish" : "Next"}
-                </Button>
-              </div>
+      <div style={{ marginTop: "30px" }}>
+        <ButtonStepper activeStep={activeStep} setActiveStep={setActiveStep} errors={errors} />
+        <div className="ListingInfo">
+          <div className="ListingInfoMain">
+            <CurrentStep activeStep={activeStep} active={active} setActive={setActive} />
+            <div className="ListingNav">
+              <Button
+                color="primary"
+                onClick={() => {
+                  if (activeStep > 0) setActiveStep(old => old - 1);
+                }}
+                size="lg"
+                startDecorator={<KeyboardArrowLeft />}
+                style={{ marginLeft: "30px" }}
+              >
+                Back
+              </Button>
+              <Button
+                color="primary"
+                onClick={handleSubmit}
+                size="lg"
+                endDecorator={<KeyboardArrowRight />}
+                style={{ marginRight: "30px" }}
+              >
+                {activeStep === 2 ? "Finish" : "Next"}
+              </Button>
             </div>
           </div>
         </div>
-    </CssVarsProvider >
+      </div>
+    </CssVarsProvider>
   )
 }
+
 export default AddListing;

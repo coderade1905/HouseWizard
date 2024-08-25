@@ -15,12 +15,18 @@ import FilterCheckBox from "./CheckBox";
 import { CssVarsProvider } from "@mui/joy/styles";
 import { collection, query, orderBy, startAt, endAt, getDocs, where } from 'firebase/firestore';
 import FormHelperText from '@mui/joy/FormHelperText';
-import { db } from '../../firebase';
+import {InputNumMin, InputNumMax} from '../minicomps/Input.jsx';
+import { HomeContext } from '../../App';
+import supabase from '../../supabase.js';
+
 
 export default function DrawerFilters({ margin, useHouses }) {
   const [open, setOpen] = React.useState(false);
   const [type, setType] = React.useState([]);
   const [price, setPrice] = React.useState({min: 0, max : 0});
+  const [area, setArea] = React.useState({min: 0, max : 0});
+  const [bednum, setBednum] = React.useState({min: 0, max : 0});
+  const { setHouses, setStatus, loading, setLoading } = React.useContext(HomeContext);
   const types =
   {
     "House for sale": "hfs",
@@ -31,26 +37,53 @@ export default function DrawerFilters({ margin, useHouses }) {
     "For rent for businesses": "frb",
     "Appartment": "app"
   }
-  async function fetchData() {
+  function fetchData() {
+    const fetchListings = async (filtertype, filterprice, filterarea, filterbednum) => {
+      try {
+        console.log(filterprice, 15);
+        let query = supabase.from('listings').select('*');
+        if (filterprice.min !== 0 && filterprice.min !== undefined) {
+          query = query.filter('price', 'gte', filterprice.min);
+        }
+        if (filterprice.max !== 0 && filterprice.max !== undefined) {
+          query = query.filter('price', 'lte', filterprice.max);
+        }
+        if (filterarea.min !== 0 && filterarea.min !== undefined) {
+          query = query.filter('area', 'gte', filterarea.min);
+        }
+        if (filterarea.max !== 0 && filterarea.max !== undefined) {
+          query = query.filter('area', 'lte', filterarea.max);
+        }
+        if (filterbednum.min !== 0 && filterbednum.min !== undefined) {
+          query = query.filter('bednum', 'gte', filterbednum.min);
+        }
+        if (filterbednum.max !== 0 && filterbednum.max !== undefined) {
+          query = query.filter('bednum', 'lte', filterbednum.max);
+        }
+        if (filtertype.length > 0) {
+          query = query.filter('type', 'in', `(${filtertype.join(',')})`);
+        }
+        setLoading(true);
+        let { data, error } = await query;
+        setLoading(false);
+        return data;
+      }
+      catch (e) {
+        console.log("Connection error!")
+      }
+    }
     let filtertype = ["hfs", "hfr", "rfr", "lnd", "fsb", "frb", "app"];
-    let filterprice = {min: 0, max: 10000};
+    setHouses([]);
     if (type.length > 0) {
       filtertype = [];
       type.map((element) => {
         filtertype.push(types[element]);
       })
     }
-    if (price.min > 0 && price.max > 0) {
-      filterprice = price;
+    fetchListings(filtertype, price, area, bednum)
+    .then((listings) => {console.log(listings), setHouses(listings)})
+    .catch((e) => {console.error(e), setStatus('e')});
     }
-    const querySnapshot = await getDocs(query(collection(db, "listings"), where("data.type", "in", filtertype), where("data.price", ">=", filterprice.min), where("data.price", "<=", filterprice.max)));
-    setHouses([]);
-    querySnapshot.forEach((doc) => {
-      let res = doc.data().data;
-      setHouses((prev) => [...prev, { title: res.title, price: res.price, type: res.type, area: res.area, im: res.im, pname: res.pname, lat: res.lat, lng: res.lng, description: res.description, extras: res.extras, id : doc.id }])
-      console.log(res, 1544);
-    });
-  }
   return (
     <CssVarsProvider defaultMode="dark">
       <React.Fragment>
@@ -90,17 +123,44 @@ export default function DrawerFilters({ margin, useHouses }) {
           >
             <DialogTitle>Filters</DialogTitle>
             <ModalClose />
+            <div>
+              <FormLabel>Area range</FormLabel>
+              <div style={{maxWidth:"100%", display: "flex", justifyContent: "space-around", marginTop: "20px"}}>
+                <div>
+                  <InputNumMin value={area.min} data={area} setData={setArea} placeholder="Min area" />
+                  <FormHelperText style={{width: "90px"}}>Minimum area</FormHelperText>
+                </div>
+                <div>
+                  <InputNumMax value={area.max} data={area} setData={setArea} placeholder="Max area" />
+                  <FormHelperText style={{width: "90px"}}>Maximum area</FormHelperText>
+                </div>
+              </div>
+            </div>
             <Divider sx={{ mt: "auto" }} />
             <div>
               <FormLabel>Price range</FormLabel>
               <div style={{maxWidth:"100%", display: "flex", justifyContent: "space-around", marginTop: "20px"}}>
                 <div>
-                  <Input style={{width: "90px"}}  placeholder="Min price" type="number" value={price.min} onChange={(e) => { setPrice({ ...price, min: Number(e.target.value) }) }}/>
+                  <InputNumMin value={price.min} data={price} setData={setPrice} placeholder="Min price" />
                   <FormHelperText style={{width: "90px"}}>Minimum price</FormHelperText>
                 </div>
                 <div>
-                <Input style={{width: "90px"}}  placeholder="Max price" type="number" value={price.max} onChange={(e) => { setPrice({ ...price, max: Number(e.target.value) }) }}/>
+                <InputNumMin value={price.max} data={price} setData={setPrice} placeholder="Max price" />
                   <FormHelperText style={{width: "90px"}}>Maximum price</FormHelperText>
+                </div>
+              </div>
+            </div>
+            <Divider sx={{ mt: "auto" }} />
+            <div>
+              <FormLabel>Bednum range</FormLabel>
+              <div style={{maxWidth:"100%", display: "flex", justifyContent: "space-around", marginTop: "20px"}}>
+                <div>
+                  <InputNumMin value={bednum.min} data={bednum} setData={setBednum} placeholder="Min bednum" />
+                  <FormHelperText style={{width: "90px"}}>Minimum bednum</FormHelperText>
+                </div>
+                <div>
+                  <InputNumMin value={bednum.max} data={bednum} setData={setBednum} placeholder="Max bednum" />
+                  <FormHelperText style={{width: "90px"}}>Maximum bednum</FormHelperText>
                 </div>
               </div>
             </div>

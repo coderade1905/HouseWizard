@@ -9,29 +9,31 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import DrawerFilters from './Filter';
 import { HomeContext } from '../../App';
 import { useContext } from 'react';
+import ViewInDetail from '../ViewInDetail';
 
 const drawerBleeding = 56;
 
 const Root = styled('div')(({ theme }) => ({
-  backgroundColor: grey[800],
+  backgroundColor: "#2c2f33",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)"
 }));
 
 const StyledBox = styled('div')(({ theme }) => ({
-  backgroundColor:  grey[800],
+  backgroundColor: "#2c2f33"
 }));
 
 const Puller = styled('div')(({ theme }) => ({
   width: 30,
-  height: 6,
+  height: 5,
   backgroundColor:  grey[300],
-  borderRadius: 3,
+  borderRadius: 20,
   position: 'absolute',
   top: 8,
   left: 'calc(50% - 15px)',
 }));
 
 function SwipeableEdgeDrawer(props) {
-  const {open, setOpen} = useContext(HomeContext);
+  const {open, setOpen, Houses, selected} = useContext(HomeContext);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
@@ -43,7 +45,7 @@ function SwipeableEdgeDrawer(props) {
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            height: `calc(100% - ${drawerBleeding}px)`,
+            height: `calc(90% - ${drawerBleeding}px)`,
             overflow: 'visible',
           },
         }}
@@ -64,15 +66,15 @@ function SwipeableEdgeDrawer(props) {
           sx={{
             position: 'absolute',
             top: -drawerBleeding,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
             visibility: 'visible',
             right: 0,
             left: 0,
           }}
         >
           <Puller />
-          <Typography sx={{ p: 2, color: '#fff' }}>51 nearby houses</Typography>
+          <Typography sx={{ p: 2, color: '#fff' }}>51 houses</Typography>
         </StyledBox>
         <StyledBox
           sx={{
@@ -82,17 +84,8 @@ function SwipeableEdgeDrawer(props) {
             overflow: 'auto',
           }}
         >
-        <DrawerFilters margin={0}/>
-        <Skeleton style={{borderRadius: "5px", marginBottom: "10px", marginTop: "10px"}} variant="rectangular"  width="100%" height={160} sx={{ bgcolor: '#777' }}/>
-        <Skeleton height={30} sx={{ bgcolor: '#777' }} />
-        <Skeleton height={30} sx={{ bgcolor: '#777' }} width="60%" />
-        <div style={{display: 'flex', justifyContent: 'space-around', marginTop: "10px"}}>
-            <Skeleton variant="circular" sx={{ bgcolor: '#777' }} width={40} height={40} />
-            <Skeleton variant="circular" sx={{ bgcolor: '#777' }} width={40} height={40} />
-            <Skeleton variant="circular" sx={{ bgcolor: '#777' }} width={40} height={40} />
-            <Skeleton variant="circular" sx={{ bgcolor: '#777' }} width={40} height={40} />
-        </div>
-        <Skeleton style={{borderRadius: "5px", marginBottom: "10px", marginTop: "20px"}} variant="rectangular"  width="100%" height={250} sx={{ bgcolor: '#777' }}/>
+        <ViewInDetail />
+       
         </StyledBox>
       </SwipeableDrawer>
     </Root>

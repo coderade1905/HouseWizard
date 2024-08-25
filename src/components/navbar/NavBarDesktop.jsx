@@ -6,18 +6,14 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
 import MapIcon from '@mui/icons-material/Map';
 import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { useContext , useEffect} from 'react';
-import { HomeContext } from '../../App';
+import AccountMenu from '../minicomps/AccountMenu.jsx';
 import { useLocation } from 'react-router-dom';
-import firebase from 'firebase/compat/app';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -59,60 +55,49 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
 export default function PrimarySearchAppBar({map, setMap, setHome}) {
   const navigate = useNavigate();
   const currentRoute = useLocation();
   useEffect(() => {
     if (currentRoute.pathname === "/map") {setMap(true);}
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        //pass
-      } else {
-        navigate('/login');
-      }
-    });
   }, [])
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar style={{background: "rgba(20, 20, 20, 0.7)", margin: '0', backdropFilter: "blur(20px)",  padding: '0', borderBottom: "1px solid #777", zIndex: 100, position: "fixed", top: "0"}}>
-         <Toolbar>
-            {map? <IconButton size="large" edge="start" color="inherit" aria-label="Home" sx={{ mr: 2 }} onClick={() => {navigate('/'), setMap(!map)}}><HomeIcon /></IconButton> : <IconButton size="large" edge="start" color="inherit" aria-label="Map" sx={{ mr: 2 }} onClick={() => {navigate('/map'), setMap(!map)}}><MapIcon /></IconButton>}
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-            Gojo Felega
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'flex', md: 'flex' } }} onClick={() => {setHome(false), setMap(true), navigate('/chat')}}>
-            <IconButton size="large"  color="inherit" >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" aria-label="create an ad" color="inherit" onClick={() => {setHome(false), setMap(true), navigate('/add')}}>
-                  <AddIcon />
-            </IconButton>
-            <IconButton size="large" aria-label="account of current user" color="inherit" onClick={() => {setHome(false), setMap(true), navigate('/mylistings')}}>
-                <AccountCircle />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-    </Box>
+    <ThemeProvider theme={darkTheme}>
+          <Box sx={{ flexGrow: 1 }}>
+          <AppBar style={{background: "rgba(20, 20, 20, 0.7)", margin: '0', backdropFilter: "blur(20px)",  padding: '0', borderBottom: "1px solid #777", zIndex: 100, position: "fixed", top: "0"}}>
+            <Toolbar>
+                {map? <IconButton size="large" edge="start" color="inherit" aria-label="Home" sx={{ mr: 2 }} onClick={() => {navigate('/'), setMap(!map)}}><HomeIcon /></IconButton> : <IconButton size="large" edge="start" color="inherit" aria-label="Map" sx={{ mr: 2 }} onClick={() => {navigate('/map'), setMap(!map)}}><MapIcon /></IconButton>}
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+              >
+                Gojo Felega
+              </Typography>
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search…"
+                  inputProps={{ 'aria-label': 'search' }}
+                />
+              </Search>
+              <Box sx={{ flexGrow: 1 }} />
+              <Box sx={{ display: { display : 'flex' } }}>
+                <AccountMenu />
+              </Box>
+            </Toolbar>
+          </AppBar>
+        </Box>
+    </ThemeProvider>
   );
 }

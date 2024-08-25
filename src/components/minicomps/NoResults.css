@@ -1,0 +1,21 @@
+.no-results {
+    text-align: center;
+    margin: 50px 0;
+    color: #555;
+}
+
+.no-results h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.no-results-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+}

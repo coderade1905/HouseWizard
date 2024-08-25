@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Typography from '@mui/joy/Typography';
+import ScrollableTabsButtonAuto from './minicomps/scrollmenu.jsx'
 import '../styles/ViewInDetail.css';
 import Box from '@mui/joy/Box';
 import Chip from '@mui/joy/Chip';
@@ -18,36 +18,28 @@ import {Slideshow} from './minicomps/slideshow.jsx';
 
 function ViewInDetail() {
     const { setOpen, placeInfo } = useContext(HomeContext);
-    let allPhotos = [placeInfo.im, placeInfo.im, placeInfo.im, placeInfo.im, placeInfo.im, placeInfo.im, placeInfo.im];
-    console.log(allPhotos);
+    let allPhotos = [placeInfo.im[0], placeInfo.im[0], placeInfo.im[0], placeInfo.im[0], placeInfo.im[0], placeInfo.im[0], placeInfo.im[0]];
+    console.log(placeInfo);
     const navigate = useNavigate();
     const Icons = {"tv" : <TvIcon />, "wifi" : <NetworkWifi3BarIcon />, "kitchen" : <SoupKitchenIcon />, "parking" : <LocalParkingIcon />, "heating" : <HvacIcon /> };
     const types = { "hfs": "House for sale", "hfr": "House for rent", "rfr": "Room for rent", "lnd": "Land", "fsb": "For sell for businesses", "frb": "For rent for businesses", "app": "Appartment" };
     return (
-        <div style={{ overflowY: "scroll", height: "calc(100vh - 60px)" }}>
-            <div className="header" onClick={e => { setOpen(false) }}>
-                <KeyboardArrowLeft style={{ fontSize: "45px", color: "white" }} />
-            </div>
+        <div style={{ overflowY: "hidden" }}>
             <div className='view-in-detail'>
-                <Slideshow allPhotos={allPhotos}/>
                 <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <span className="housetitle">ETB {placeInfo.price} + 2BEDS</span>
-                    <Button onClick={() => {navigate(`/chat/${placeInfo.pemail}`)}} startDecorator={<CallIcon />}>Contact seller</Button>
+                    <span className="housetitle">ETB {placeInfo.price} + {placeInfo.area} SQM {placeInfo.bednum > 0 ? "| " + placeInfo.bednum + " Beds" : ""}</span>
                 </div>
-                <span style={{color: "rgb(170, 170, 170", fontSize: "18px"}}>{types[placeInfo.type]} | {placeInfo.area} sqm</span>
-                <Box sx={{marginTop: "20px" }}>
-                    {placeInfo.extras.map((element, i) => {
+                <span style={{color: "#bbbbbb", fontSize: "18px"}}>{types[placeInfo.type]} | {placeInfo.location}</span>
+                <Box sx={{marginTop: "20px", display: "flex", gap: "15px", flexWrap: "wrap", borderBottom: "1px #777 solid", paddingBottom: "15px" }}>
+                    {placeInfo.extras.length > 0 ? placeInfo.extras.map((element, i) => {
                         return (
-                            <Chip sx={{marginRight: "5px"}} key={i} variant='soft' startDecorator={Icons[element]}>
+                            <Chip sx={{marginRight: "5px", padding: "8px 12px", color: "#fff", background: "#5865f2", borderRadius: "8px", fontSize: "14px", display: "flex", alignItems: "center"}} key={i} variant='soft' startDecorator={Icons[element]}>
                                 {element}
                             </Chip>
                         )
-                    })}
+                    }) : ""}
                 </Box>
-                <div className="description" style={{ marginTop: "20px" }}>
-                    <h2 style={{marginTop: "5px"}}>Description: </h2>
-                    <p>{placeInfo.description}</p>
-                </div>
+                <ScrollableTabsButtonAuto />
             </div>
         </div>
     )

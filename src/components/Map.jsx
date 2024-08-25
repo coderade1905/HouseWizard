@@ -1,148 +1,144 @@
-
-import '../styles/Map.css';
-import { HomeContext } from '../App';
-import { useContext, useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, LayersControl, useMapEvents, useMap, Tooltip } from 'react-leaflet';
+import React, { useEffect, useState, useContext } from 'react';
+import { MapContainer, TileLayer, Marker, LayersControl, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { BingLayer } from 'react-leaflet-bing-v2';
-import 'leaflet/dist/leaflet.css';
-import axios from "axios";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-import "../styles/leaflet_geolocation.css";
 import SwipeableEdgeDrawer from './navbar/Drawer.jsx';
-import PermanentDrawerLeft from './navbar/DrawerDesktop.jsx';
-import { db } from "../firebase";
-import { collection, query, where, orderBy, startAt, doc, getDoc, getDocs } from 'firebase/firestore';
-import { useParams } from 'react-router-dom';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-geosearch/dist/geosearch.css';
 import * as L from "leaflet";
+import Button from '@mui/material/Button';
+import '../styles/Map.css'; 
+import { HomeContext } from '../App';
+import supabase from '../supabase.js';
 
+// Define marker icons
+const createIcon = (color) => new L.Icon({
+  iconUrl: `https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
-const { BaseLayer } = LayersControl;
+const colors = {"hfs": createIcon("blue"), "hfr" : createIcon("gold"), "rfr" : createIcon("green"), "lnd" : createIcon("violet"), "fsb" : createIcon("green"), "frb" : createIcon("black"), "app" : createIcon("grey")}
+const blueIcon = createIcon("blue");
+const redIcon = createIcon("red");
 
 const SearchField = () => {
-  const provider = new OpenStreetMapProvider();
-
-  const searchControl = new GeoSearchControl({
-    provider: provider,
-    showMarker: false,
-    style: 'button'
-  });
-
   const map = useMap();
   useEffect(() => {
+    const provider = new OpenStreetMapProvider();
+    const searchControl = new GeoSearchControl({
+      provider,
+      style: 'bar',
+      showMarker: true,
+      retainZoomLevel: false,
+      animateZoom: true,
+      autoClose: true,
+      searchLabel: 'Enter address',
+    });
     map.addControl(searchControl);
     return () => map.removeControl(searchControl);
-  }, []);
-
+  }, [map]);
   return null;
 };
-function VMap() {
-  const [Zoom, setZoom] = useState(13);
-  const {setMap, setPlaceInfo, Houses, setHouses, setOpen, selected, setSelected, position, setPostion } = useContext(HomeContext);
-  async function fetchData() {
-    const querySnapshot = await getDocs(collection(db, "listings"));
-    setHouses([]);
-    querySnapshot.forEach((doc) => {
-      let res = doc.data().data;
-      setHouses((prev) => [...prev, { title: res.title, price: res.price, type: res.type, area: res.area, im: res.im, pname: res.pname, lat: res.lat, lng: res.lng, description: res.description, extras: res.extras, id : doc.id, pemail: res.pemail }])
+
+const VMap = () => {
+  const { Houses, setHouses, setLoading, position, open, setOpen, setPlaceInfo, placeInfo } = useContext(HomeContext);
+  const MapEventHandler = ({ fetchData }) => {
+    const map = useMap();
+    useMapEvents({
+      moveend: () => {
+        if (map) {
+          const bounds = map.getBounds();
+          console.log('Map moved with bounds:', bounds); // Debugging line
+          fetchData(bounds);
+        }
+      },
     });
-    const map = useMap();
-    let center = map.getCenter();
-    setPostion([center.lat, center.lng]);
-  }
-  useEffect(() => {
-    fetchData();
-  }, [])
-  const RecenterAutomatically = () => { 
-    const map = useMap();
-    useEffect(() => {
-      map.setView([position[0], position[1]]);
-    }, [position]);
   
     return null;
   };
-  const redIcon = new L.Icon({
-    iconUrl: "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-  const blueIcon = new L.Icon({
-    iconUrl: "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });;
-  let { id } = useParams();
-  useEffect(() => {
-    async function FetchData() {
-      if (id) {
-        console.log(id, 123);
-        const snapshot = await getDoc(doc(db, "listings", id));
-        if (snapshot.exists()) {
-          // Document exists, you can access its data
-          const data = snapshot.data();
-          console.log("Document data:", data);
-          setOpen(true);
-          setPlaceInfo(data.data);
-          setMap(true);
-        } else {
-          console.log("Document does not exist.");
-        }
+  const fetchData = async (bounds) => {
+    console.log('Fetching data with bounds:', bounds); // Debugging line
+    const { _southWest: sw, _northEast: ne } = bounds;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('listings_in_view', {
+        min_lat: sw.lat,
+        min_long: sw.lng,
+        max_lat: ne.lat,
+        max_long: ne.lng,
+      });
+
+      if (error) {
+        console.error('Error retrieving properties:', error);
+        return [];
       }
+      console.log('Fetched data:', data); // Debugging line
+      setHouses(data);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    } finally {
+      setLoading(false);
     }
-    FetchData();
-  }, []);
-  const MapEvents = () => {
-    const map = useMap();
-    useMapEvents({
-      zoomend() {
-        const zoom = map.getZoom();
-        setZoom(zoom);
-      }
-    });
-    return false;
+  }
+  const [keys, setKeys] = useState(false);
+
+  const handleMarkerClick = (house) => {
+    setPlaceInfo(house);
+    setOpen(!open);
   };
-  const bing_key = "AqzrTtXbcEmNFpX06G5Y-jVe9EqScIvfH1H_5UHhMY2HT3k-igxa02ggMbZiIWCY";
+  const HandleMapLoad =  (map) => {
+    const bounds = map.getBounds();
+    console.log(map);
+    fetchData(bounds);
+  };
   return (
     <>
-      <div className="map">
-        <PermanentDrawerLeft setSelected={setSelected} />
-        <MapContainer center={position} zoom={20}  >
+      <SwipeableEdgeDrawer />
+      <div style={{ height: 'calc(100vh - 65px)', width: '100%', position: 'relative' }}>
+        <div className="color-key">
+          <Button onClick={() => setKeys(!keys)}>{keys ? "Hide Keys" : "Show keys"}</Button>
+          <div style={{display: keys ? "grid" : "none"}}>
+            <div><span className="color-box" style={{backgroundColor: "#2A81CB"}}></span>House for sale</div>
+            <div><span className="color-box" style={{backgroundColor: "#FFD326"}}></span>House for rent</div>
+            <div><span className="color-box" style={{backgroundColor: "#2AAD27"}}></span>Room for rent</div>
+            <div><span className="color-box" style={{backgroundColor: "#9C2BCB"}}></span>Land</div>
+            <div><span className="color-box" style={{backgroundColor: "#3D3D3D"}}></span>For sale for businesses</div>
+            <div><span className="color-box" style={{backgroundColor: "#CB8427"}}></span>For rent for businesses</div>
+            <div><span className="color-box" style={{backgroundColor: "#7B7B7B"}}></span>Apartment</div>
+          </div>
+        </div>
+        <MapContainer whenReady={({ target }) => {
+          HandleMapLoad(target);
+        }} center={position} zoom={15} style={{ height: "100%", width: "100%" }}>
           <SearchField />
           <LayersControl position='topright'>
-            <BaseLayer name='Road'>
-              <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
-            </BaseLayer>
-            <BaseLayer checked name='Satlite'>
-              <BingLayer bingkey={bing_key} type="AerialWithLabels" />
-            </BaseLayer>
+            <LayersControl.BaseLayer checked name='Road'>
+              <TileLayer url="https://{s}.tile.osm.org/{z}/{x}/{y}.png" />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name='Satellite'>
+              <BingLayer bingkey="AqzrTtXbcEmNFpX06G5Y-jVe9EqScIvfH1H_5UHhMY2HT3k-igxa02ggMbZiIWCY" type="AerialWithLabels" />
+            </LayersControl.BaseLayer>
           </LayersControl>
-          <MapEvents />
-          {Zoom >= 13 ?
-            Houses.map(((element, i) => {
-              console.log(element);
-              return (
-                <Marker
-                  eventHandlers={{
-                    click: (e) => {
-                      setOpen(true);
-                      setPlaceInfo(element);
-                      setSelected(element.id);
-                      setPostion([element.lat, element.lng]);
-                    },
-                  }} key={i} position={[element.lat, element.lng]} icon={(element.id === selected? redIcon : blueIcon)}>
-                  <Tooltip>ETB {element.price}, Area  4sqm</Tooltip>
-                </Marker>
-              );
-            }))
-            : null}
-            <RecenterAutomatically />
+          <MapEventHandler fetchData={fetchData} />
+          {Houses.map(house => (
+            <Marker
+              key={house.id}
+              position={[house.lat, house.lng]}
+              icon={house.id === placeInfo.id ? redIcon : colors[house.type]}
+              eventHandlers={{
+                click: () => handleMarkerClick(house),
+              }}
+            >
+              <Tooltip>{`ETB ${house.price}, Area 4sqm`}</Tooltip>
+            </Marker>
+          ))}
         </MapContainer>
       </div>
-      <SwipeableEdgeDrawer  />
     </>
   );
-}
+};
+
 export default VMap;

@@ -1,0 +1,68 @@
+
+   h2 {
+    text-align: center;
+    color: #fff;
+  }
+  
+  .edit-profile-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff;
+    width: 100%;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #333;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  @media (max-width: 600px) {
+    .edit-profile-container {
+      padding: 15px;
+    }
+  
+    .form-group input {
+      font-size: 14px;
+    }
+  
+    .submit-btn {
+      font-size: 14px;
+    }
+  }
+  

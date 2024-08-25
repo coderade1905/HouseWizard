@@ -2,3 +2,131 @@
     width: 100wh; 
     height: 100%;
   }
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.locationcont {
+  width: 90%;
+  max-width: 600px;
+}
+.DesktopStepper {
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+.input{
+  width: 300px;
+}
+@media screen and (max-width: 730px) {
+  .inputs {
+    grid-template-columns: 1fr !important;
+    place-items: initial !important;
+  }
+  .input{
+    width: auto;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+  .inputs label{
+    margin-left: 40px;
+  }
+  .css-13clm1n-JoyFormHelperText-root{
+    margin-left: 40px !important;
+  }
+  .DesktopStepper {
+    display: none;
+  }
+}
+.leaflet-right {
+  z-index: 1001 !important;
+}
+.thumbnail {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s;
+  border-radius: 10px;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 1001;
+  transition: transform 0.3s;
+}
+
+.close-button:hover {
+  transform: scale(1.1);
+}
+
+.download-button {
+  position: absolute;
+  top: 20px;
+  right: 60px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 1001;
+  text-decoration: none;
+  transition: transform 0.3s;
+}
+
+.download-button:hover {
+  transform: scale(1.1);
+}
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

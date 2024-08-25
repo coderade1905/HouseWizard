@@ -1,0 +1,19 @@
+.error-boundary {
+    padding: 20px;
+    margin: 20px;
+    margin-top: 90px;
+    border: 1px solid red;
+    background-color: #fdd;
+    color: #900;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.error-boundary h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.error-boundary p {
+    font-size: 16px;
+}
