@@ -23,9 +23,10 @@
     color: #fff;
     width: 100%;
   }
-  
-  .form-group input {
+  .form-group input, .form-group textarea {
     width: 100%;
+    max-width: 100%;
+    min-width: 100%; 
     padding: 10px;
     border: 1px solid #ccc;
     background: #333;

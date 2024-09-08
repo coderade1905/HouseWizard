@@ -11,14 +11,27 @@ import AddHomeIcon from '@mui/icons-material/AddHome';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import Logout from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../../supabase.js';
+import translation from '../translation/translation.js';
+import { useContext } from 'react';
+import { HomeContext } from '../../App';
 
 export default function AccountMenu() {
   const navigate = useNavigate();
+  const { language, setLanguage } = useContext(HomeContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+  const handleLogout = async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+          console.error('Error logging out:', error);
+      } else {
+          navigate('/login');
+      }
+};
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -73,27 +86,27 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
+        <MenuItem onClick={() => {handleClose(); navigate('/profile')}}>
+          <Avatar /> {translation[language]['prf']}
         </MenuItem>
         <MenuItem onClick={() => {handleClose(); navigate('/add')}}>
           <ListItemIcon>
             <AddHomeIcon fontSize="small" />
           </ListItemIcon>
-          Add Listing
+          {translation[language]['adl']}
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {handleClose(); navigate('/mylistings')}}>
           <ListItemIcon>
             <MyLocationIcon fontSize="small" />
           </ListItemIcon>
-          My Listings
+          {translation[language]['mls']}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {handleClose(); handleLogout()}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
-          Logout
+          {translation[language]['lg']}
         </MenuItem>
       </Menu>
     </React.Fragment>

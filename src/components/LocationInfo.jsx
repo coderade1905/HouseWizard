@@ -10,6 +10,8 @@ import FormHelperText from '@mui/joy/FormHelperText';
 import Input from '@mui/joy/Input';
 import { HomeContext } from "../App";
 import "../styles/leaflet_geolocation.css";
+import translation from './translation/translation.js';
+
 
 const { BaseLayer } = LayersControl;
 
@@ -31,15 +33,17 @@ const SearchField = () => {
     return null;
 };
 
-function MapIn({ marker, setMarker }) {
-    const defaultPosition = [9.668168, 39.516678]; // Default position if marker is not set
-
+function MapIn({ marker, setMarker, position }) {
     const MapEvents = () => {
         const map = useMap();
         useMapEvents({
             click: (e) => {
                 const { lat, lng } = e.latlng;
-                setMarker({ ...marker, lat : lat, lng : lng, geo : `POINT(${lng} ${lat})`});
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                .then(response => response.json())
+                .then(data => {
+                    setMarker({ ...marker, lat : lat, lng : lng, geo : `POINT(${lng} ${lat})`, location : data.display_name});
+                });
             },
         });
         return null;
@@ -49,7 +53,7 @@ function MapIn({ marker, setMarker }) {
 
     return (
         <div style={{ width: "100%", height: 500, zIndex: 1, position: "relative" }}>
-            <MapContainer center={marker?.lat && marker?.lng ? [marker?.lat, marker?.lng] : defaultPosition} zoom={20}>
+            <MapContainer center={marker?.lat && marker?.lng ? [marker?.lat, marker?.lng] : position} zoom={20}>
                 <SearchField />
                 <LayersControl position='topright'>
                     <BaseLayer name='Road'>
@@ -71,7 +75,7 @@ function MapIn({ marker, setMarker }) {
 }
 
 function MapInput() {
-    const { data, setData, errors } = useContext(HomeContext);
+    const { data, setData, errors, position, language } = useContext(HomeContext);
 
     let options = {
         startColor: "#fff",
@@ -98,14 +102,15 @@ function MapInput() {
                     fontSize: "35px"
                 }}
             >
-                Step 2: Add Location Information
+                {translation[language]['lin']}
             </Typography>
             <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "30px" }}>
                 <div className="locationcont">
                     <div>
-                        <h2 style={{ color: "#fff", fontSize: "20px" }}>Enter the location of the property and point it on the map</h2>
-                        <FormControl style={{marginBottom: "10px"}}>
-                                <FormLabel>Location</FormLabel>
+                        <h2 style={{ color: "#fff", fontSize: "20px" }}>{translation[language]['ptl']}</h2>
+                        <MapIn marker={data} setMarker={setData} position={position} />
+                        <FormControl style={{marginTop: "10px"}}>
+                                <FormLabel>{translation[language]['loc']}</FormLabel>
                                 <Input
                                     placeholder="E.x Debre Berhan, Tebasse"
                                     value={data.location || ""}
@@ -115,12 +120,11 @@ function MapInput() {
                                 />
                                 <FormHelperText>{errors.locerror}</FormHelperText>
                         </FormControl>
-                        <MapIn marker={data} setMarker={setData} />
                         <div style={{marginTop: "15px"}}>
                             <FormControl>
-                                <FormLabel>Latitude</FormLabel>
+                                <FormLabel>{translation[language]['lat']}</FormLabel>
                                 <Input
-                                    placeholder="Latitude"
+                                    placeholder={translation[language]['lat']}
                                     value={data.lat || ""}
                                     onChange={(e) => {
                                         if (!isNaN(e.target.value)) {
@@ -132,9 +136,9 @@ function MapInput() {
                                 <FormHelperText>{errors.laterror}</FormHelperText>
                             </FormControl>
                             <FormControl>
-                                <FormLabel>Longitude</FormLabel>
+                                <FormLabel>{translation[language]['lng']}</FormLabel>
                                 <Input
-                                    placeholder="Longitude"
+                                    placeholder={translation[language]['lng']}
                                     value={data.lng || ""}
                                     onChange={(e) => {
                                         if (!isNaN(e.target.value)) {

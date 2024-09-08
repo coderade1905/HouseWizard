@@ -15,8 +15,10 @@ import { useContext, useState } from 'react';
 import { HomeContext } from "../App";
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabase.js';
+import Review from './Review.jsx';
+import translation from './translation/translation.js';
 
-const steps = ['Basic Information', 'Location Information', 'Media Information'];
+const steps = ['Basic Information', 'Location Information', 'Media Information', 'Review'];
 
 function ButtonStepper({ activeStep, setActiveStep }) {
   return (
@@ -56,15 +58,17 @@ const CurrentStep = ({ activeStep, active, setActive }) => {
       return <MapInput />;
     case 2:
       return <MediaInfo />;
+    case 3:
+      return <Review />;
     default:
-      return null;
+      return <BasicInfo active={active} setActive={setActive} />;
   }
 }
 
 function AddListing() {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-  const { data, setData, errors, setErrors, user, active, setActive } = useContext(HomeContext);
+  const { data, language, errors, setErrors, user, active, setActive } = useContext(HomeContext);
 
   const insertRecord = async (data1) => {
     const { data: insertData, error } = await supabase
@@ -79,7 +83,7 @@ function AddListing() {
   };
 
   const handleSubmit = async () => {
-    if (activeStep < 3) {
+    if (activeStep < 4) {
       setErrors({});
       let hasError = false;
 
@@ -104,10 +108,6 @@ function AddListing() {
           setErrors(prev => ({ ...prev, derror: "This field is required" }));
           hasError = true;
         }
-        if (!active.extras && data.extras.length === 0) {
-          setErrors(prev => ({ ...prev, exerror: "This field is required" }));
-          hasError = true;
-        }
         if (!hasError) setActiveStep(old => old + 1);
       }
       else if (activeStep === 1) {
@@ -126,19 +126,13 @@ function AddListing() {
         if (!hasError) setActiveStep(old => old + 1);
       }
       else if (activeStep === 2) {
+        setActiveStep(old => old + 1);
+      }
+      else if (activeStep === 3) {
         try {
-          const { data: user1, error } = await supabase.auth.getUser();
-
-          if (error) {
-            console.error('Error fetching user:', error);
-            return;
-          }
-
-          if (user1 && user1.user) {
-            setData({ ...data, user_id: user1.user.id });
-            await insertRecord(data);
-            navigate("/");
-            console.log(data);
+          if (user != {}) {
+            await insertRecord({...data, user_id: user.id });
+            navigate('/mylistings');
           } else {
             console.error('User data is not available');
           }
@@ -166,7 +160,7 @@ function AddListing() {
                 startDecorator={<KeyboardArrowLeft />}
                 style={{ marginLeft: "30px" }}
               >
-                Back
+                {translation[language]['bck']}
               </Button>
               <Button
                 color="primary"
@@ -175,7 +169,7 @@ function AddListing() {
                 endDecorator={<KeyboardArrowRight />}
                 style={{ marginRight: "30px" }}
               >
-                {activeStep === 2 ? "Finish" : "Next"}
+                {activeStep === 3 ? translation[language]['fnh'] : translation[language]['nxt']}
               </Button>
             </div>
           </div>

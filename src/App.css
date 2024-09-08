@@ -1,7 +1,8 @@
 .leaflet-container {
-    width: 100wh; 
-    height: 100%;
-  }
+  width: 100wh;
+  height: 100%;
+}
+
 .loading {
   position: fixed;
   top: 0;
@@ -14,41 +15,54 @@
   align-items: center;
   z-index: 1000;
 }
+
 .locationcont {
   width: 90%;
   max-width: 600px;
 }
+
 .DesktopStepper {
   display: flex;
   justify-content: center;
   align-items: center
 }
-.input{
+
+.input {
   width: 300px;
 }
+
 @media screen and (max-width: 730px) {
+  .drawer-left {
+    overflow-y: hidden !important;
+  }
   .inputs {
     grid-template-columns: 1fr !important;
     place-items: initial !important;
   }
-  .input{
+
+  .input {
     width: auto;
-    margin-left: 40px;
-    margin-right: 40px;
+    margin-left: 40px !important;
+    margin-right: 40px !important;
   }
-  .inputs label{
+
+  .inputs label {
     margin-left: 40px;
   }
-  .css-13clm1n-JoyFormHelperText-root{
+
+  .css-13clm1n-JoyFormHelperText-root {
     margin-left: 40px !important;
   }
+
   .DesktopStepper {
     display: none;
   }
 }
+
 .leaflet-right {
   z-index: 1001 !important;
 }
+
 .thumbnail {
   width: 100%;
   height: auto;
@@ -114,10 +128,12 @@
 .download-button:hover {
   transform: scale(1.1);
 }
+
 .video-container {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  padding-bottom: 56.25%;
+  /* 16:9 aspect ratio */
   height: 0;
   overflow: hidden;
 }

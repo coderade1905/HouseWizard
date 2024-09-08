@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
-import { collection, query, orderBy, startAt, endAt, getDocs, where } from 'firebase/firestore';
-import { db } from '../firebase';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect, useContext } from "react";
+import supabase from '../supabase.js';
 import Button from '@mui/joy/Button';
 import { House } from "./Home";
 import AlertDialogModal from "./Alert";
 import { useNavigate } from "react-router-dom";
+import NoResults from './minicomps/NoResults.jsx';
+import { HomeContext } from '../App';
+import { LoadingSkeleton } from './navbar/DrawerDesktop.jsx';
+import translation from './translation/translation.js';
 
 function MyListings() {
     const [listing, setListing] = useState([]);
@@ -13,44 +15,66 @@ function MyListings() {
     const [id, setId] = useState("");
     const [deleted, setDeleted] = useState(0);
     const navigate = useNavigate();
+    const { types, loading, setLoading, language } = useContext(HomeContext);
     useEffect(() => {
-        const auth = getAuth();
-        auth.authStateReady().then(() => {
-            const user = auth.currentUser;
+        const fetchListings = async () => {
+            const { data: user } = await supabase.auth.getUser()
+            setLoading(true);
             if (user) {
-                async function fetchData() {
-                    const querySnapshot = await getDocs(query(collection(db, "listings"), where("data.pemail", "==", user.email)));
-                    setListing([]);
-                    querySnapshot.forEach((doc) => {
-                        let res = doc.data().data;
-                        setListing((prev) => [...prev, { title: res.title, price: res.price, type: res.type, area: res.area, im: res.im, pname: res.pname, lat: res.lat, lng: res.lng, description: res.description, id: doc.id }])
-                    });
+                const { data, error } = await supabase
+                    .rpc('get_filtered_listings', { user_id_inp: user.user.id });
+
+                if (error) {
+                    console.error('Error fetching filtered listings:', error);
+                } else {
+                    setListing(data);
+                    setLoading(false);
                 }
-                fetchData();
             }
-        });
+        };
+
+        fetchListings();
     }, [deleted]);
+    if (loading) {
+        return (
+            <div className="sectionlist">
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+            </div>
+        )
+    }
+    if (listing.length == 0) {
+        return (
+            <>
+                <NoResults />
+            </>
+        )
+    }
     return (
         <div>
             <AlertDialogModal open={open} setOpen={setOpen} id={id} setDeleted={setDeleted} />
-            <h1 style={{ color: "white", marginTop: "30px", marginLeft: "30px" }}>My Listings</h1>
-            {
-                listing.map(((element, i) => {
-                    console.log(element);
-                    return (
-                        <div key={i} style={{display: "flex", justifyContent: "space-around"}}>
-                            <div  onClick={() => {navigate(`/listing/${element.id}`)}}>
-                                <House title={element.title} price={element.price} type={element.type} area={element.area} im={element.im} pname={element.pname}  />
-                            </div>
-                            <div style={{display: "flex", alignItems: "center"}}>
-                                <Button onClick={() => {setOpen(!open), setId(element.id)}} size="md" color="danger" style={{width: "200px", height: "60px"}} >
-                                    Delete this listing
+            <h1 style={{ color: "white", marginTop: "30px", marginLeft: "30px" }}>{translation[language]['mls']}</h1>
+            <div className="sectionlist">
+                {
+                    listing.map((element, i) => {
+                        return (
+                            <div style={{ display: "grid", placeItems: "center" }} key={i}>
+                                <House data={element} types={types} language={language} />
+                                <Button onClick={() => { setOpen(!open); setId(element.id); }} size="md" color="danger" style={{ height: "40px", width: "90%" }}>
+                                    {translation[language]['del']}
+                                </Button>
+                                <Button onClick={() => { navigate(`/editlisting/${element.id}`) }} size="md" style={{ height: "40px", width: "90%", marginTop: "10px" }}>
+                                    {translation[language]['edt']}
                                 </Button>
                             </div>
-                        </div>
-                    );
-                }))
-            }
+                        );
+                    })
+                }
+            </div>
         </div>
     );
 }

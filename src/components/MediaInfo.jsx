@@ -11,6 +11,7 @@ import { HomeContext } from "../App";
 import LoadingOverlay from "./LoadingOverlay.jsx";
 import Input from '@mui/joy/Input';
 import { v4 as uuidv4 } from 'uuid';
+import translation from './translation/translation.js';
 
 const VisuallyHiddenInput = styled('input')`
   clip: rect(0 0 0 0);
@@ -48,7 +49,6 @@ function Inputs({setFailed}) {
                 .storage
                 .from(bucketName)
                 .getPublicUrl(`public/${fileName}`);
-            console.log(data1.data.publicUrl);
             if (data1.error) {
                 console.error('Error getting public URL:', urlError);
                 setFailed([true, urlError])
@@ -77,18 +77,19 @@ function Inputs({setFailed}) {
         const urls = await Promise.all(uploadPromises);
     
         // Assuming data.im is meant to be populated with URLs after all uploads are done
-        data.im = urls.filter(url => url !== null);
+        data.im = [...data.im, ...urls.filter(url => url !== null)];
     };
-
+    const { language } = useContext(HomeContext);
     return (
-        <div className="inputs" style={{gridTemplateColumns: "1fr"}}>
-            <FormControl style={{marginRight: "40px"}}>
-                <FormLabel>Images of the property</FormLabel>
+        <div className="inputs">
+            <FormControl>
+                <FormLabel>{translation[language]['imgp']}</FormLabel>
                 <Button
                     component="label"
                     role={undefined}
                     tabIndex={-1}
                     color="primary"
+                    className="input"
                     startDecorator={
                         <SvgIcon>
                             <svg
@@ -107,19 +108,23 @@ function Inputs({setFailed}) {
                         </SvgIcon>
                     }
                 >
-                    Upload a file
-                    <VisuallyHiddenInput multiple type="file" onChange={handleUpload} />
+                    {translation[language]['upf']}
+                    <VisuallyHiddenInput multiple type="file" accept="image/*"  onChange={handleUpload} />
                 </Button>
                 {loading && <FormHelperText>Uploading...</FormHelperText>}
-                <FormLabel style={{marginTop: "15px"}}>Youtube video</FormLabel>
-                <Input  onChange={(e) => {setData({ ...data, youtube: e.target.value })}}  className="input" placeholder="Paste the video link here" />
+            </FormControl>
+            <FormControl>
+                <FormLabel>{translation[language]['ytv']}</FormLabel>
+                <Input onChange={(e) => {setData({ ...data, youtube: e.target.value })}}  className="input" placeholder="Paste the video link here" />
             </FormControl>
         </div>
+        
     );
 }
 
 function MediaInfo() {
     const [failed, setFailed] = useState([false, ""]);
+    const { language } = useContext(HomeContext);
     const options = {
         startColor: "#fff",
         endColor: "#FF6767",
@@ -145,7 +150,7 @@ function MediaInfo() {
                     fontSize: "35px"
                 }}
             >
-                Step 3: Add Media Information
+                {translation[language]['min']}
             </Typography>
             <Inputs setFailed={setFailed} />
         </>

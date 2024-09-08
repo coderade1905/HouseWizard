@@ -9,11 +9,13 @@ import Option from '@mui/joy/Option';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { useContext, useState } from 'react';
 import { HomeContext } from "../App";
+import translation from './translation/translation.js';
 
 
-function TypeSelect({ values, setValues, active, setActive }) {
+function TypeSelect({ values, setValues, active, setActive, setData }) {
+    const { language } = useContext(HomeContext);
     const handleChange = (event, newValue) => {
-        setValues({...values, type: newValue});
+        setValues({ bednum: 0, type: newValue, area: 0, price: 0, description: "", extras: [], lng: "", lat: "", im : [], geo: "", location : "", youtube : "", user_id: ''});
         switch (newValue) {
             case "rfr":
                 setActive({bednum: true, area: false, price: false, description: false, extras: false})
@@ -35,23 +37,24 @@ function TypeSelect({ values, setValues, active, setActive }) {
     return (
         <Select
             className="input"
-            placeholder="Type of property"
+            placeholder={translation[language]['top']}
             value={values.type}
             onChange={handleChange}
             indicator={<KeyboardArrowDown />}
             >
-            <Option value="hfs">House for sale</Option>
-            <Option value="hfr">House for rent</Option>
-            <Option value="rfr">Room for rent</Option>
-            <Option value="lnd">Land</Option>
-            <Option value="fsb">For sell for businesses</Option>
-            <Option value="frb">For rent for businesses</Option>
-            <Option value="app">Appartment</Option>
+            <Option value="hfs">{translation[language]['hfs']}</Option>
+            <Option value="hfr">{translation[language]['hfr']}</Option>
+            <Option value="rfr">{translation[language]['rfr']}</Option>
+            <Option value="lnd">{translation[language]['lnd']}</Option>
+            <Option value="fsb">{translation[language]['fsb']}</Option>
+            <Option value="frb">{translation[language]['frb']}</Option>
+            <Option value="app">{translation[language]['app']}</Option>
         </Select>
     );
 }
 
 function SelectMultiple({ values, setValues, disabled }) {
+    const { language } = useContext(HomeContext);
     const handleChange = (event, newValue) => {
         setValues({...values, extras: newValue});
     };
@@ -74,46 +77,47 @@ function SelectMultiple({ values, setValues, disabled }) {
                 },
             }}
         >
-            <Option value="wifi">Wifi</Option>
-            <Option value="kitchen">Kitchen</Option>
-            <Option value="tv">TV</Option>
-            <Option value="parking">Parking</Option>
-            <Option value="heating">Heating</Option>
+            <Option value="wifi">{translation[language]['wifi']}</Option>
+            <Option value="kitchen">{translation[language]['kitchen']}</Option>
+            <Option value="tv">{translation[language]['tv']}</Option>
+            <Option value="parking">{translation[language]['parking']}</Option>
+            <Option value="heating">{translation[language]['heating']}</Option>
         </Select>
     );
 }
 
 function Inputs(props) {
-    const { data, setData, errors } = useContext(HomeContext);
+    const { data, setData, errors, language } = useContext(HomeContext);
+    const pmo =  ["hfr", "rfr", "frb"];
     return (
         <div className="inputs">
             <FormControl>
-                <FormLabel>Type</FormLabel>
+                <FormLabel>{translation[language]['typ']}</FormLabel>
                 <TypeSelect className="input" values={data} setValues={setData} active={props.active} setActive={props.setActive} />
                 <FormHelperText>{errors.tyerror}</FormHelperText>
             </FormControl>
             <FormControl style={{display: props.active.bednum ? "none" : "block"}}>
-                <FormLabel>Bed Number</FormLabel>
-                <Input disabled={props.active.bednum} className="input" type="number" placeholder="Bed Number" value={data.bednum} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, bednum: Number(e.target.value) })}}} />
+                <FormLabel>{translation[language]['bdnum']}</FormLabel>
+                <Input disabled={props.active.bednum}  className="input" type="number" placeholder={translation[language]['bdnum']} value={data.bednum === 0 ? '' : data.bednum} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, bednum: Number(e.target.value) })}}} />
                 <FormHelperText>{errors.bderror}</FormHelperText>
             </FormControl>
             <FormControl style={{display: props.active.area ? "none" : "block"}}>
-                <FormLabel>Area</FormLabel>
-                <Input disabled={props.active.area} className="input" value={data.area} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, area: Number(e.target.value) })}}} type="number" startDecorator="sqm" placeholder="Area" />
+                <FormLabel>{translation[language]['ar']}</FormLabel>
+                <Input disabled={props.active.area} className="input" value={data.area === 0 ? '' : data.area}  onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, area: Number(e.target.value) })}}} type="number" startDecorator={translation[language]['sqm']} placeholder={translation[language]['ar']} />
                 <FormHelperText>{errors.aerror}</FormHelperText>
             </FormControl>
             <FormControl style={{display: props.active.price ? "none" : "block"}}>
-                <FormLabel>Price</FormLabel>
-                <Input disabled={props.active.price} className="input" value={data.price} onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, price: Number(e.target.value) })}}} type="number" startDecorator="ETB" placeholder="Price" />
+                <FormLabel>{translation[language]['pr']} {pmo.includes(data.type) ? translation[language]['pmo'] : ""}</FormLabel>
+                <Input disabled={props.active.price} className="input" value={data.price === 0 ? '' : data.price}  onChange={(e) => {if (Number(e.target.value) < 0) {return } else{setData({ ...data, price: Number(e.target.value) })}}} type="number" startDecorator={translation[language]['etb']} placeholder={translation[language]['pr']} />
                 <FormHelperText>{errors.perror}</FormHelperText>
             </FormControl>
             <FormControl style={{display: props.active.description ? "none" : "block"}}>
-                <FormLabel>Description</FormLabel>
-                <Textarea disabled={props.active.description} className="input" value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} placeholder="Description" />
+                <FormLabel>{translation[language]['desc']}</FormLabel>
+                <Textarea disabled={props.active.description} className="input" value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} placeholder={translation[language]['desc']} />
                 <FormHelperText>{errors.derror}</FormHelperText>
             </FormControl>
             <FormControl style={{display: props.active.extras ? "none" : "block"}}>
-                <FormLabel>Extras</FormLabel>
+                <FormLabel>{translation[language]['amen']}</FormLabel>
                 <SelectMultiple disabled={props.active.extras} className="input" values={data} setValues={setData} />
                 <FormHelperText>{errors.exerror}</FormHelperText>
             </FormControl>
@@ -129,6 +133,7 @@ function BasicInfo({active, setActive}) {
         variant: "h2",
         textAlign: "left"
     };
+    const { language } = useContext(HomeContext);
     return (
         <>
             <Typography
@@ -146,7 +151,7 @@ function BasicInfo({active, setActive}) {
                     fontSize: "35px"
                 }}
             >
-                Step 1: Add Basic Information
+                {translation[language]['adb']}
             </Typography>
             <Inputs active={active} setActive={setActive} />
         </>

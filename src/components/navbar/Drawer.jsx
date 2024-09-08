@@ -3,23 +3,25 @@ import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { grey, lightGreen } from '@mui/material/colors';
-import Skeleton from '@mui/material/Skeleton';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Typography from '@mui/material/Typography';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import DrawerFilters from './Filter';
 import { HomeContext } from '../../App';
 import { useContext } from 'react';
 import ViewInDetail from '../ViewInDetail';
+import { useNavigate } from 'react-router-dom';
+import translation from '../translation/translation.js';
 
 const drawerBleeding = 56;
 
 const Root = styled('div')(({ theme }) => ({
-  backgroundColor: "#2c2f33",
+  backgroundColor: "#141414",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)"
 }));
 
 const StyledBox = styled('div')(({ theme }) => ({
-  backgroundColor: "#2c2f33"
+  backgroundColor: "#141414"
 }));
 
 const Puller = styled('div')(({ theme }) => ({
@@ -32,12 +34,15 @@ const Puller = styled('div')(({ theme }) => ({
   left: 'calc(50% - 15px)',
 }));
 
-function SwipeableEdgeDrawer(props) {
-  const {open, setOpen, Houses, selected} = useContext(HomeContext);
+function SwipeableEdgeDrawer({fetchData, bounds}) {
+  const {open, setOpen, Houses, placeInfo, language} = useContext(HomeContext);
+  const navigate = useNavigate();
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
+  const fetchData1 = () => {
+    fetchData(bounds);
+  }
 
   return (
     <Root>
@@ -74,7 +79,7 @@ function SwipeableEdgeDrawer(props) {
           }}
         >
           <Puller />
-          <Typography sx={{ p: 2, color: '#fff' }}>51 houses</Typography>
+          <Typography sx={{ p: 2, color: '#fff' }}>{Houses.length} {translation[language]['house']}{Houses.length > 1? translation[language]['s'] : ""}</Typography>
         </StyledBox>
         <StyledBox
           sx={{
@@ -84,7 +89,8 @@ function SwipeableEdgeDrawer(props) {
             overflow: 'auto',
           }}
         >
-        <ViewInDetail />
+        {placeInfo.id? <div onClick={() => {navigate('/map')}} style={{width: "100%", display: "flex", color: "#fff", padding: "5px", margin: "10px 0px 10px 0px"}}><ArrowBackIosIcon sx={{fontSize: "30px"}}/></div> : <DrawerFilters margin={30} fetchData={fetchData1}/>}
+        <ViewInDetail  />
        
         </StyledBox>
       </SwipeableDrawer>

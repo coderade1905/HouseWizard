@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import supabase from '../supabase.js';
 import '../styles/Profile.css';
 import { useNavigate } from 'react-router-dom';
+import translation from './translation/translation.js';
+import { HomeContext } from '../App';
 
 const EditProfile = () => {
     const navigate = useNavigate();
+    const { language } = useContext(HomeContext);
     const [user, setUser] = useState(null); // To store the authenticated user
     const [profile, setProfile] = useState({
         firstName: '',
@@ -15,6 +18,7 @@ const EditProfile = () => {
         instagram: '',
         uid: '', // Will be set after the user is fetched
     });
+    const [first, setFirst] = useState(true);
 
     // Load initial profile data (if available)
     useEffect(() => {
@@ -35,18 +39,19 @@ const EditProfile = () => {
                 const { data, error } = await supabase
                     .from('user_info')
                     .select('*')
-                    .eq('UID', userData.id)
+                    .eq('uid', userData.id)
                     .single(); // Assuming each user has one profile
 
                 if (data) {
+                    setFirst(false);
                     setProfile({
-                        firstName: data.FirstName || '',
-                        lastName: data.LastName || '',
-                        phoneNumber: data.PhoneNumber || '',
-                        email: data.Email || '',
-                        telegram: data.Telegram || '',
-                        instagram: data.Instagram || '',
-                        uid: data.UID,
+                        firstName: data.firstname || '',
+                        lastName: data.lastname || '',
+                        phoneNumber: data.phonenumber || '',
+                        email: data.email || '',
+                        telegram: data.telegram || '',
+                        instagram: data.instagram || '',
+                        uid: data.uid,
                     });
                 }
 
@@ -69,33 +74,53 @@ const EditProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { data, error } = await supabase
-            .from("user_info")
-            .update({
-                FirstName: profile.firstName,
-                LastName: profile.lastName,
-                PhoneNumber: profile.phoneNumber,
-                Email: profile.email,
-                Telegram: profile.telegram,
-                Instagram: profile.instagram,
-            })
-            .eq('UID', user.id); // Update the record with the matching UID
+        if (first) {
+            const { data, error } = await supabase
+                .from("user_info")
+                .insert({
+                    firstname: profile.firstName,
+                    lastname: profile.lastName,
+                    phonenumber: profile.phoneNumber,
+                    email: profile.email,
+                    telegram: profile.telegram,
+                    instagram: profile.instagram,
+                    uid: user.id
+                })
 
-        if (error) {
-            console.error("Error updating profile:", error);
-        } else {
-            console.log("Profile updated:", data);
-            navigate('/');
+            if (error) {
+                console.error("Error updating profile:", error);
+            } else {
+                navigate('/');
+            }
+        }
+        else {
+            const { data, error } = await supabase
+                .from("user_info")
+                .update({
+                    firstname: profile.firstName,
+                    lastname: profile.lastName,
+                    phonenumber: profile.phoneNumber,
+                    email: profile.email,
+                    telegram: profile.telegram,
+                    instagram: profile.instagram,
+                })
+                .eq('uid', user.id);
+
+            if (error) {
+                console.error("Error updating profile:", error);
+            } else {
+                navigate('/');
+            }
         }
     };
 
 
     return (
         <div className="edit-profile-container">
-            <h2>Profile and Contact</h2>
+            <h2>{translation[language]['pc']}</h2>
             <form className="edit-profile-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="firstName">First Name</label>
+                    <label htmlFor="firstName">{translation[language]['fn']}</label>
                     <input
                         type="text"
                         id="firstName"
@@ -106,7 +131,7 @@ const EditProfile = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="lastName">{translation[language]['ln']}</label>
                     <input
                         type="text"
                         id="lastName"
@@ -117,7 +142,7 @@ const EditProfile = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phoneNumber">Phone Number</label>
+                    <label htmlFor="phoneNumber">{translation[language]['pn']}</label>
                     <input
                         type="tel"
                         id="phoneNumber"
@@ -128,7 +153,7 @@ const EditProfile = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">{translation[language]['em']}</label>
                     <input
                         type="email"
                         id="email"
@@ -139,7 +164,7 @@ const EditProfile = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="telegram">Telegram username</label>
+                    <label htmlFor="telegram">{translation[language]['tg']}</label>
                     <input
                         type="text"
                         id="telegram"
@@ -149,7 +174,7 @@ const EditProfile = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="instagram">Instagram Username</label>
+                    <label htmlFor="instagram">{translation[language]['ig']}</label>
                     <input
                         type="text"
                         id="instagram"

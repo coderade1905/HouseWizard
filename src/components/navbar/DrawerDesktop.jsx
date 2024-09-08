@@ -1,12 +1,12 @@
 import * as React from 'react';
-import DrawerFilters from './Filter';
-import { House } from '../Home';
-import { HomeContext } from '../../App';
-import { useContext } from 'react';
 import ViewInDetail from '../ViewInDetail';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { HomeContext } from '../../App';
+import { useContext } from 'react';
+import DrawerFilters from './Filter';
+import { useNavigate } from 'react-router-dom';
 
 export function LoadingSkeleton() {
   return (
@@ -20,38 +20,16 @@ export function LoadingSkeleton() {
   )
 }
 
-export default function PermanentDrawerLeft({setSelected}) {
-  const { Houses, setHouses, open, setOpen, setPlaceInfo, position, setPostion } = useContext(HomeContext);
+export default function PermanentDrawerLeft({fetchData, bounds}) {
+  const {placeInfo} = useContext(HomeContext);
+  const navigate = useNavigate();
+  const fetchData1 = () => {
+    fetchData(bounds);
+  }
   return (
-    !open ? (
-      <div style={{ overflowY: "auto", height: "calc(100vh - 60px)" }}>
-        <DrawerFilters margin={20} />
-        <h1 style={{ color: "#fff", marginBottom: "0px", marginLeft: "20px" }}>Nearby</h1>
-        <div className='nearbylist'>
-          {Houses.length === 0 ? (
-            <>
-            <LoadingSkeleton />
-            <LoadingSkeleton />
-            <LoadingSkeleton />
-            <LoadingSkeleton />
-            </>) : (
-              Houses.map(((element, i) => {
-                return (
-                  <div style={{ display: "flex", justifyContent: "center" }} key={i} onClick={() => {
-                    setOpen(true);
-                    setPlaceInfo(element);
-                    setSelected(element.id);
-                    setPostion([element.lat, element.lng]);
-                  }}>
-                    <House title={element.title} price={element.price} type={element.type} area={element.area} im={element.im} pname={element.pname} />
-                  </div>
-                );
-              }))
-          )}
-        </div>
-      </div >
-    ) : (
-      <ViewInDetail />
-    )
+    <div className="drawer-left">
+      {placeInfo.id? <div onClick={() => {navigate('/map')}} style={{width: "100%", display: "flex", color: "#fff", padding: "5px", margin: "10px 0px 10px 0px"}}><ArrowBackIosIcon sx={{fontSize: "30px"}}/></div> :  <DrawerFilters margin={30} fetchData={fetchData1}/>}
+        <ViewInDetail />
+    </div>
   );
 }

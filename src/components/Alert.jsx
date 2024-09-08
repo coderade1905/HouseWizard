@@ -7,28 +7,43 @@ import DialogActions from '@mui/joy/DialogActions';
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { doc, deleteDoc } from "firebase/firestore";
-import { db } from '../firebase';
+import supabase from '../supabase.js';
+import { HomeContext } from '../App';
+import translation from './translation/translation.js';
+import { useContext } from "react";
 
-export default function AlertDialogModal({open, setOpen, id, setDeleted}) {
+export default function AlertDialogModal({ open, setOpen, id, setDeleted }) {
+  const { language } = useContext(HomeContext);
   return (
     <React.Fragment>
       <Modal open={open} onClose={() => setOpen(false)}>
         <ModalDialog variant="outlined" role="alertdialog">
           <DialogTitle>
             <WarningRoundedIcon />
-            Confirmation
+            {translation[language]['cfn']}
           </DialogTitle>
           <Divider />
           <DialogContent>
-            Are you sure you want to delete this listing?
+            {translation[language]['ays']}
           </DialogContent>
           <DialogActions>
-            <Button variant="solid" color="danger" onClick={async () => {await deleteDoc(doc(db, "listings", id)), setOpen(false), setDeleted(prev => prev += 1)}}>
-              Yes
+            <Button variant="solid" color="danger" onClick={async () => {
+              const { error } = await supabase
+                .from('listings')
+                .delete()
+                .eq('id', id);
+
+              if (!error) {
+                setOpen(false);
+                setDeleted(prev => prev += 1);
+              } else {
+                console.error("Error deleting listing:", error.message);
+              }
+            }}>
+              {translation[language]['yes']}
             </Button>
             <Button variant="plain" color="neutral" onClick={() => setOpen(false)}>
-              Cancel
+              {translation[language]['no']}
             </Button>
           </DialogActions>
         </ModalDialog>

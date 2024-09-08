@@ -8,7 +8,7 @@ import { useContext, useState } from 'react';
 import ReactPlayer from 'react-player/youtube';
 import Button from '@mui/material/Button';
 import ContactPhoneRoundedIcon from '@mui/icons-material/ContactPhoneRounded';
-import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import translation from '../translation/translation.js';
 import DirectionsRoundedIcon from '@mui/icons-material/DirectionsRounded';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
@@ -22,7 +22,7 @@ const darkTheme = createTheme({
 
 export default function ScrollableTabsButtonAuto() {
   const [value, setValue] = React.useState(0);
-  const { placeInfo } = useContext(HomeContext);
+  const { placeInfo, language } = useContext(HomeContext);
 
 
   const style = {
@@ -56,19 +56,19 @@ export default function ScrollableTabsButtonAuto() {
               Contact Information
             </Typography>
             <Typography sx={{ mt: 2, color: "#fff" }}>
-              Name: {placeInfo?.user_info?.FirstName} {placeInfo.user_info.LastName}
+              Name: {placeInfo?.user_info?.firstname} {placeInfo?.user_info?.lastname}
             </Typography>
             <Typography sx={{ mt: 2, color: "#fff" }}>
-              Phone number: {placeInfo?.user_info?.PhoneNumber}
+              Phone number: {placeInfo?.user_info?.phonenumber}
             </Typography>
-            {placeInfo?.user_info?.PhoneNumber? <Typography sx={{ mt: 2, color: "#fff" }}>
-              Email: {placeInfo?.user_info?.Email}
+            {placeInfo?.user_info?.email? <Typography sx={{ mt: 2, color: "#fff" }}>
+              Email: {placeInfo?.user_info?.email}
             </Typography> : ""}
-            {placeInfo?.user_info?.Instagram? <Typography sx={{ mt: 2, color: "#fff" }}>
-              Instagram: @{placeInfo?.user_info?.Instagram}
+            {placeInfo?.user_info?.instagram? <Typography sx={{ mt: 2, color: "#fff" }}>
+              Instagram: {placeInfo?.user_info?.instagram}
             </Typography> : ""}
-            {placeInfo?.user_info?.Telegram? <Typography sx={{ mt: 2, color: "#fff" }}>
-              Telegram: @{placeInfo?.user_info?.Telegram}
+            {placeInfo?.Telegram? <Typography sx={{ mt: 2, color: "#fff" }}>
+              Telegram: {placeInfo?.user_info?.telegram}
             </Typography> : ""}
           </Box>
         </Modal>
@@ -144,14 +144,13 @@ export default function ScrollableTabsButtonAuto() {
   const About = () => {
     return (
       <>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr", placeItems: "center", width: "100%" }}>
-        <Button onClick={handleOpen} variant="contained" sx={{ borderRadius: "15px", marginBottom: "10px", background: "#026132", color: "#fff" }}><ContactPhoneRoundedIcon style={{ marginRight: "10px" }} /> Contact Seller</Button>
-        <Button onClick={handleOpen} variant="contained" sx={{ borderRadius: "15px", marginBottom: "10px", background: "#496102", color: "#fff" }}><FavoriteRoundedIcon style={{ marginRight: "10px" }} />Save</Button>
-        <Button onClick={() => {window.open(`https://www.google.com/maps/search/?api=1&query=${placeInfo.lat},${placeInfo.lng}`, "_blank")}} variant="contained" sx={{ borderRadius: "15px", marginBottom: "10px", background: "#610210", color: "#fff" }}><DirectionsRoundedIcon style={{ marginRight: "10px" }} /> View on GoogleMaps</Button>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", placeItems: "center", width: "100%", borderBottom: "1px solid #777" }}>
+        <Button onClick={handleOpen} variant="contained" sx={{ borderRadius: "15px", marginBottom: "10px", background: "#026132", color: "#fff" }}><ContactPhoneRoundedIcon style={{ marginRight: "10px" }} />{translation[language]['cs']}</Button>
+        <Button onClick={() => {window.open(`https://www.google.com/maps/search/?api=1&query=${placeInfo.lat},${placeInfo.lng}`, "_blank")}} variant="contained" sx={{ borderRadius: "15px", marginBottom: "10px", background: "#610210", color: "#fff" }}><DirectionsRoundedIcon style={{ marginRight: "10px" }} />{translation[language]['vgm']}</Button>
         <BasicModal />
       </div>
-      <Typography sx={{ mt: 2, color: "#fff" }}>
-        Description: {placeInfo?.description}
+      <Typography sx={{ mt: 2, color: "#fff", textAlign: "center"}}>
+        {placeInfo?.description}
       </Typography>
       </>
     );
@@ -173,9 +172,9 @@ export default function ScrollableTabsButtonAuto() {
     <ThemeProvider theme={darkTheme}>
       <Box sx={{ width: '100%', borderBottom: '1px solid #777' }}>
         <Tabs value={value} onChange={handleChange} scrollButtons="auto" centered>
-          <Tab label="About" />
-          <Tab label="Photos" />
-          <Tab label="Video" />
+          <Tab label={translation[language]['abt']} />
+          <Tab label={translation[language]['pht']} />
+          <Tab label={translation[language]['vid']} />
         </Tabs>
       </Box>
       <Box sx={{ p: 3 }}>
